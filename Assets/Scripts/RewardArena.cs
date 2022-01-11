@@ -778,7 +778,10 @@ public class RewardArena : MonoBehaviour
         {
             firefly.transform.position += move * Time.deltaTime;
         }
-        distToFF = Vector3.Distance(firefly.transform.position, player.transform.position);
+
+        Vector2 FF2D = new Vector2(firefly.transform.position.x, firefly.transform.position.z);
+        Vector2 PP2D = new Vector2(player.transform.position.x, player.transform.position.z);
+        distToFF = Vector2.Distance(FF2D, PP2D);
         //if (isReplay & replayIdx < replayMaxIdx)
         //{
         //    print(string.Format("x {0}, yaw {1}, z {2}", replayX[replayIdx], replayYaw[replayIdx], replayZ[replayIdx]));
@@ -796,6 +799,12 @@ public class RewardArena : MonoBehaviour
 
         //Debug.Log(string.Format("Player {0}", player.transform.position));
 
+        float burytime = PlayerPrefs.GetFloat("BuryTime");
+        if (distToFF <= 1 && firefly.transform.position.y > -0.051)
+        {
+            float buryspeed = 0.1f / (burytime * 50);
+            firefly.transform.Translate(0, - buryspeed, 0);
+        }
 
         switch (phase)
         {
@@ -1061,6 +1070,8 @@ public class RewardArena : MonoBehaviour
             {
                 checkTime.Add(Time.realtimeSinceStartup - programT0);
                 isCheck = false;
+                PlayerPrefs.SetInt("Good Trials", goodTrials);
+                PlayerPrefs.SetInt("Total Trials", trialNum);
             }
             if (isEnd)
             {
@@ -1547,8 +1558,9 @@ public class RewardArena : MonoBehaviour
 
         CancellationTokenSource source = new CancellationTokenSource();
 
-
-        distToFF = Vector3.Distance(firefly.transform.position, player.transform.position);
+        Vector2 FF2D = new Vector2(firefly.transform.position.x, firefly.transform.position.z);
+        Vector2 PP2D = new Vector2(player.transform.position.x, player.transform.position.z);
+        distToFF = Vector2.Distance(FF2D, PP2D);
         Task t = Task.CompletedTask;
 
         Task t1 = Task.Run(async () => {
@@ -1565,7 +1577,7 @@ public class RewardArena : MonoBehaviour
         {
             t = Task.Run(async () => {
                 // changed from: Mathf.Abs(ff.magnitude - player.magnitude), which did not work for 2d case
-                await new WaitUntil(() => Vector3.Distance(firefly.transform.position, player.transform.position) <= fireflyZoneRadius || t1.IsCompleted);// Used to be rb.velocity.magnitude
+                await new WaitUntil(() => distToFF <= fireflyZoneRadius || t1.IsCompleted);// Used to be rb.velocity.magnitude
             }, source.Token);
         }
 
