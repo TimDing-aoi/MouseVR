@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Settings>
+    <Setting Type="Optic Flow Settings">
+        <LifeSpan>10</LifeSpan>
+        <DrawDistance>5</DrawDistance>
+        <Density>50</Density>
+        <DistalObject>0</DistalObject>
+        <ObjectHeight>2000</ObjectHeight>
+        <ObjectWidth>1000</ObjectWidth>
+        <Walls>0</Walls>
+    </Setting>
+    <Setting Type="Joystick Settings">
+        <Dimensions>1</Dimensions>
+        <MinLinearSpeed>-20</MinLinearSpeed>
+        <MaxLinearSpeed>20</MaxLinearSpeed>
+        <MinAngularSpeed>-90</MinAngularSpeed>
+        <MaxAngularSpeed>90</MaxAngularSpeed>
+        <EndTrialOnStop>0</EndTrialOnStop>
+        <VelocityThreshold>0</VelocityThreshold>
+        <RotationThreshold>0</RotationThreshold>
+        <Gain>1</Gain>
+    </Setting>
+    <Setting Type="Firefly Settings">
+        <Size>0.15</Size>
+        <RewardZoneRadius>0.1</RewardZoneRadius>
+        <MinimumFireflyDistance>0.35</MinimumFireflyDistance>
+        <MaximumFireflyDistance>0.5</MaximumFireflyDistance>
+        <MinAngle>-45</MinAngle>
+        <MaxAngle>45</MaxAngle>
+        <JuiceTime>40</JuiceTime>
+        <Ratio>1</Ratio>
+        <D1>1</D1>
+        <D2>0</D2>
+        <D3>0</D3>
+        <D4>0</D4>
+        <D5>0</D5>
+        <R1>1</R1>
+        <R2>0</R2>
+        <R3>0</R3>
+        <R4>0</R4>
+        <R5>0</R5>
+        <Timeout>20</Timeout>
+        <Ramp>0</Ramp>
+        <RampTime>0</RampTime>
+        <RampDelay>0</RampDelay>
+        <MinimumWaittoCheck>0.1</MinimumWaittoCheck>
+        <MaximumWaittoCheck>0.2</MaximumWaittoCheck>
+        <Mean1>0.15</Mean1>
+        <MinimumIntertrialWait>2</MinimumIntertrialWait>
+        <MaximumIntertrialWait>6</MaximumIntertrialWait>
+        <Mean2>0.15</Mean2>
+        <OpticFlowSeed>5952</OpticFlowSeed>
+        <FireflySeed>4081</FireflySeed>
+    </Setting>
+    <Setting Type="Moving Firefly Settings">
+        <MovingON>0</MovingON>
+        <VertHor>0</VertHor>
+        <V1>0</V1>
+        <V2>0</V2>
+        <V3>0</V3>
+        <V4>0</V4>
+        <V5>0</V5>
+        <V6>0</V6>
+        <V7>0</V7>
+        <V8>0</V8>
+        <V9>0</V9>
+      
+    </Setting>
+    <Setting Type="Data Collection Settings">
+        <Path>C:\Users\lab\Desktop\UnityData</Path>
+        <FullON>0</FullON>
+        <NumTrials>200</NumTrials>
+        <ExpDur>30</ExpDur>
+    </Setting>
+</Settings>

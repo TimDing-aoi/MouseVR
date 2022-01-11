@@ -19,13 +19,20 @@ public class SyncController : MonoBehaviour
     public string portName = "COM3";
     public int baudRate = 2000000;
 
+    bool keyboard;
+
     // Start is called before the first frame update
     void Start()
     {
+        keyboard = (int)PlayerPrefs.GetFloat("IsKeyboard") == 1;
+
         syncController = this;
 
         sync.set(portName, baudRate, ReadTimeout, QueueLength);
-        sync.connect();
+        if (!keyboard)
+        {
+            sync.connect();
+        }
 
     }
 

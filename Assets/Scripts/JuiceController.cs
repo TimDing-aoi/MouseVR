@@ -15,9 +15,11 @@ public class JuiceController : MonoBehaviour
     private bool giveJuice = true;
     public bool IsConnected = true;
 
+    bool keyboardmode;
     // Start is called before the first frame update
     void OnEnable()
     {
+        keyboardmode = (int)PlayerPrefs.GetFloat("IsKeyboard") == 1;
         juiceController = this;
 
         _serialPort = new SerialPort();
@@ -31,15 +33,17 @@ public class JuiceController : MonoBehaviour
         _serialPort.RtsEnable = true;
         // Timeout after 0.5 seconds.
         _serialPort.ReadTimeout = 500;
-        
-        try
+        if (!keyboardmode)
         {
-            _serialPort.Open();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e);
-            IsConnected = false;
+            try
+            {
+                _serialPort.Open();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                IsConnected = false;
+            }
         }
     }
 
@@ -88,8 +92,11 @@ public class JuiceController : MonoBehaviour
         {
             toSend = string.Format("{0}\n", time);
         }
-      
-        _serialPort.Write(toSend);
+
+        if (!keyboardmode)
+        {
+            _serialPort.Write(toSend);
+        }
         await new WaitForFixedUpdate();
         giveJuice = true;
     }

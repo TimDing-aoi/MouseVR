@@ -21,13 +21,22 @@ public class RingSensor : MonoBehaviour
     public string reading;
     public bool IsConnected = true;
     float dt = 0.0f;
+
+    bool keyboard;
+
     // Start is called before the first frame update
     void Start()
     {
+        keyboard = (int)PlayerPrefs.GetFloat("IsKeyboard") == 1;
+
         ringSensor = this;
 
         ring.set(portName, baudRate, ReadTimeout, QueueLength);
-        ring.connect();
+
+        if (!keyboard)
+        {
+            ring.connect();
+        }
     }
 
     // Update is called once per frame

@@ -11,8 +11,8 @@ public class BallController : MonoBehaviour
     wrmhl ball = new wrmhl();
     public static BallController Ball;
 
-    [HideInInspector] public float pitch;
-    [HideInInspector] public float roll;
+    public float pitch;
+    public float roll;
     [HideInInspector] public float yaw;
     [HideInInspector] public float yawCopy;
 
@@ -20,9 +20,9 @@ public class BallController : MonoBehaviour
     [HideInInspector] public float deltaZ;
     [HideInInspector] public float deltaYaw;
 
-    [HideInInspector] public float xVel;
-    [HideInInspector] public float zVel;
-    [HideInInspector] public float yawVel;
+    public float xVel;
+    public float zVel;
+    public float yawVel;
 
     [HideInInspector] public float vert;
     [HideInInspector] public float hor;
@@ -58,13 +58,17 @@ public class BallController : MonoBehaviour
 
     void Start()
     {
+        keyboard = (int)PlayerPrefs.GetFloat("IsKeyboard") == 1;
+
         Ball = this;
         ball.set(portName, baudRate, ReadTimeout, QueueLength);
-        ball.connect();
+        if (!keyboard)
+        {
+            ball.connect();
+        }
         initTime = Time.time;
 
         isReplay = (int)PlayerPrefs.GetFloat("IsReplay") == 1;
-        keyboard = (int)PlayerPrefs.GetFloat("IsKeyboard") == 1;
         print(string.Format("is replay {0}, is keyboard {1}", isReplay, keyboard));
 
         // calibration
@@ -228,7 +232,7 @@ public class BallController : MonoBehaviour
                 roll = Input.GetAxis("Horizontal");
                 xVel = roll / Time.deltaTime/100;
                 // 1 = 50 deg/s
-                yawVel = roll / Time.deltaTime*4f;
+                // yawVel = roll / Time.deltaTime*4f;
                 //print(Time.deltaTime);
             }
             else
