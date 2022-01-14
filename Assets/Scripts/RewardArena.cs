@@ -294,7 +294,7 @@ public class RewardArena : MonoBehaviour
     public bool ramp;
     public float rampTime;
     public float rampDelay;
-
+    private float buryTime;
     //private SerialPort sp;
     //private string port = "COM7";
     //private int baudrate = 115200;
@@ -530,7 +530,9 @@ public class RewardArena : MonoBehaviour
         firefly.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
         ratio = PlayerPrefs.GetFloat("Ratio");
         ramp = PlayerPrefs.GetInt("Ramp") == 1;
-       
+
+        buryTime = PlayerPrefs.GetFloat("BuryTime");
+
         rampTime = PlayerPrefs.GetFloat("Ramp Time");
         rampDelay = PlayerPrefs.GetFloat("Ramp Delay");
 
@@ -799,10 +801,10 @@ public class RewardArena : MonoBehaviour
 
         //Debug.Log(string.Format("Player {0}", player.transform.position));
 
-        float burytime = PlayerPrefs.GetFloat("BuryTime");
-        if (distToFF <= 1 && firefly.transform.position.y > -0.051)
+        
+        if (buryTime > 0 && firefly.transform.position.y > -0.051)
         {
-            float buryspeed = 0.1f / (burytime * 50);
+            float buryspeed = 0.1f / (buryTime * 50);
             firefly.transform.Translate(0, - buryspeed, 0);
         }
 
