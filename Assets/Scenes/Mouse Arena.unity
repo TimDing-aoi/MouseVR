@@ -1709,7 +1709,7 @@ Camera:
     m_Bits: 1559
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 3
+  m_TargetDisplay: 2
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
@@ -11261,7 +11261,7 @@ Camera:
     m_Bits: 1
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 2
+  m_TargetDisplay: 3
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
