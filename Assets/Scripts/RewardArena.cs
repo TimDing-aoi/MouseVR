@@ -375,6 +375,8 @@ public class RewardArena : MonoBehaviour
     private bool areWalls;
     // replay settings
     bool isReplay;
+
+    public int minutes_elapsed;
     //string replayPath;
     //readonly List<float> replayX = new List<float>();
     //readonly List<float> replayZ = new List<float>();
@@ -1218,7 +1220,7 @@ public class RewardArena : MonoBehaviour
 
         idx++;
 
-        
+        minutes_elapsed = (int)Time.realtimeSinceStartup;
 
     }
 
