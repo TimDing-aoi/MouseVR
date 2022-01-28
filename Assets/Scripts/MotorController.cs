@@ -177,63 +177,63 @@ public class MotorController : MonoBehaviour
 
     }
 
-    public void SetValue(float input)
-    {
-        if (!(input.GetType() != typeof(float)))
-        {
-            Debug.LogWarning("MotorController: input type not int or float.");
-            return;
-        }
+    //public void SetValue(float input)
+    //{
+    //    if (!(input.GetType() != typeof(float)))
+    //    {
+    //        Debug.LogWarning("MotorController: input type not int or float.");
+    //        return;
+    //    }
 
-        var lerp = Mathf.RoundToInt(Mathf.Lerp(0f, 255f, Mathf.InverseLerp(0f, 90f, input)));
+    //    var lerp = Mathf.RoundToInt(Mathf.Lerp(0f, 255f, Mathf.InverseLerp(0f, 90f, input)));
 
-        if (value == lerp)
-        {
-            // we don't need to reset value if it's the same as before
-            return;
-        }
+    //    if (value == lerp)
+    //    {
+    //        // we don't need to reset value if it's the same as before
+    //        return;
+    //    }
 
-        if (lerp > 255)
-        {
-            value = 255;
-        }
-        else if (lerp < 0)
-        {
-            value = 0;
-        }
-        else
-        {
-            value = lerp;
-        }
-    }
+    //    if (lerp > 255)
+    //    {
+    //        value = 255;
+    //    }
+    //    else if (lerp < 0)
+    //    {
+    //        value = 0;
+    //    }
+    //    else
+    //    {
+    //        value = lerp;
+    //    }
+    //}
 
-    public void SetValue(int input)
-    {
-        if (!(input.GetType() != typeof(int))) 
-        {
-            Debug.LogWarning("MotorController: input type not int or float.");
-            return;
-        }
+    //public void SetValue(int input)
+    //{
+    //    if (!(input.GetType() != typeof(int))) 
+    //    {
+    //        Debug.LogWarning("MotorController: input type not int or float.");
+    //        return;
+    //    }
 
-        if (value == input)
-        {
-            // we don't need to reset value if it's the same as before
-            return;
-        }
+    //    if (value == input)
+    //    {
+    //        // we don't need to reset value if it's the same as before
+    //        return;
+    //    }
 
-        if (input > 255)
-        {
-            value = 255;
-        }
-        else if (input < 0)
-        {
-            value = 0;
-        }
-        else
-        {
-            value = input;
-        }
-    }
+    //    if (input > 255)
+    //    {
+    //        value = 255;
+    //    }
+    //    else if (input < 0)
+    //    {
+    //        value = 0;
+    //    }
+    //    else
+    //    {
+    //        value = input;
+    //    }
+    //}
 
     private void OnDisable()
     {

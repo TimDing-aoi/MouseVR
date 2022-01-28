@@ -61,6 +61,7 @@ public class RewardArena : MonoBehaviour
     public GameObject firefly;
     public GameObject distalObject;
     public GameObject walls;
+    public GameObject walls2;
     public GameObject MainCamera;
     public Camera MonitorCam;
     public GameObject Menu;
@@ -372,7 +373,7 @@ public class RewardArena : MonoBehaviour
     bool rampingDown = false;
     bool enterPressed = false;
     public bool IsStop = false;
-    private bool areWalls;
+    private int areWalls;
     // replay settings
     bool isReplay;
 
@@ -657,7 +658,7 @@ public class RewardArena : MonoBehaviour
 
         juiceTime = PlayerPrefs.GetFloat("Juice Time");
         distalOn = PlayerPrefs.GetInt("Distal Object") != 5;
-        areWalls = (int)PlayerPrefs.GetFloat("Walls") == 1;
+        areWalls = (int)PlayerPrefs.GetFloat("Walls");
         maxTrials = (int)PlayerPrefs.GetFloat("Num Trials");
         expDur = (int)PlayerPrefs.GetFloat("ExpDur");
         //for (int i = 0; i < 3; i++)
@@ -665,13 +666,19 @@ public class RewardArena : MonoBehaviour
         //    GameObject child = walls.transform.GetChild(i).gameObject;
         //    child.GetComponent<MeshRenderer>().enabled = false;
         //}
-        if (areWalls)
+     
+        // mesh renderer for inv walls
+        if (areWalls == 1)
         {
             walls.SetActive(true);
 
+        } else if (areWalls == 2)
+        {
+            walls2.SetActive(true);
         } else
         {
             walls.SetActive(false);
+            walls2.SetActive(false);
         }
         
 
@@ -699,10 +706,10 @@ public class RewardArena : MonoBehaviour
         player.transform.position = new Vector3(0.0f, p_height, 0.0f);
         player.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
         //print("Begin test.");
-        contPath = "C:\\Users\\lab\\Desktop\\DevData" + "/continuous_data_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
+        contPath = "C:\\Users\\lab\\Desktop\\Data" + "/continuous_data_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
         //print(contPath);
         // string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ, zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,TTL,Tx,Ty,Tz,Rx,Ry,Rz,head_dir";
-        string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir";
+        string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,AccX,AccY,AccZ,GyroX,GyroY,GyroZ";
     
         // firstLine = "n,max_v,max_w,ffv,onDuration,PosX0,PosY0,PosZ0,RotX0,RotY0,RotZ0,RotW0,ffX,ffY,ffZ,pCheckX,pCheckY,pCheckZ,rCheckX,rCheckY,rCheckZ,rCheckW,distToFF,rewarded,timeout,beginTime,checkTime,rewardTime,duration,delays,ITI";
    
@@ -996,8 +1003,17 @@ public class RewardArena : MonoBehaviour
             {
                 xVel = velMin;
             }
+            //if (areWalls == true)
+            //{
+            //    var vr_arena_limit = 0.25f;
 
-         
+            //    if (player.transform.position.x > Mathf.Abs(vr_arena_limit) || player.transform.position.z > Mathf.Abs(vr_arena_limit))
+            //    {
+            //        xVel = 0;
+            //        zVel = 0;
+            //    }
+    
+            //}
 
             //print(string.Format("{0}, {1}", zVel, xVel));
 
@@ -1026,26 +1042,26 @@ public class RewardArena : MonoBehaviour
                     break;
             }
             // if angle is defined, we are in training stage
-            if (areWalls == true)
-            {
-                var vr_arena_limit = 0.25f;
-                if (player.transform.position.x < -vr_arena_limit)
-                {
-                    player.transform.position = new Vector3(-vr_arena_limit, p_height, player.transform.position.z);
-                }
-                if (player.transform.position.x > vr_arena_limit)
-                {
-                    player.transform.position = new Vector3(vr_arena_limit, p_height, player.transform.position.z);
-                }
-                if (player.transform.position.z < -vr_arena_limit)
-                {
-                    player.transform.position = new Vector3(player.transform.position.x, p_height, -vr_arena_limit);
-                }
-                if (player.transform.position.z > vr_arena_limit)
-                {
-                    player.transform.position = new Vector3(player.transform.position.x, p_height, vr_arena_limit);
-                }
-            }
+            //if (areWalls == true)
+            //{
+            //    
+            //    if (player.transform.position.x < -vr_arena_limit)
+            //    {
+            //        player.transform.position = new Vector3(-vr_arena_limit, p_height, player.transform.position.z);
+            //    }
+            //    if (player.transform.position.x > vr_arena_limit)
+            //    {
+            //        player.transform.position = new Vector3(vr_arena_limit, p_height, player.transform.position.z);
+            //    }
+            //    if (player.transform.position.z < -vr_arena_limit)
+            //    {
+            //        player.transform.position = new Vector3(player.transform.position.x, p_height, -vr_arena_limit);
+            //    }
+            //    if (player.transform.position.z > vr_arena_limit)
+            //    {
+            //        player.transform.position = new Vector3(player.transform.position.x, p_height, vr_arena_limit);
+            //    }
+            //}
 
 
 
@@ -1133,7 +1149,7 @@ public class RewardArena : MonoBehaviour
                     //string.Join(",", labJackController.ValueAIN)) + "\n");
                 } else
                 {
-                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16}",
+                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17}",
                     trialNum,
                     Time.realtimeSinceStartup - programT0,
                     (int)currPhase,
@@ -1149,9 +1165,9 @@ public class RewardArena : MonoBehaviour
                     score,
                     rewardTime,
                     timedout,
-                    //accelController.IsConnected ? accelController.reading : "NaN,NaN,NaN,NaN,NaN,NaN",
                     sync_ttl,
-                    head_dir
+                    head_dir,
+                    accelController.IsConnected ? accelController.reading : "NaN,NaN,NaN,NaN,NaN,NaN"
                     ) + "\n");
                     //string.Join(",", labJackController.ValueAIN)) + "\n");
                 }
@@ -1159,7 +1175,7 @@ public class RewardArena : MonoBehaviour
         }
         score = 0;
         timedout = 0;
-
+        //Debug.Log(accelController.reading);
 
         Keyboard keyboard = Keyboard.current;
         //print(string.Format(" exp dur = {0}, time = {1}", expDur, Time.realtimeSinceStartup));
@@ -1374,11 +1390,19 @@ public class RewardArena : MonoBehaviour
 
 
         // spawn ff randomly in unit circle with radius 0.25
-        if (areWalls)
+        if (areWalls == 1)
         {
             //position = UnityEngine.Random.insideUnitSphere * 0.25f;
             float ff_x = UnityEngine.Random.Range(-0.25f, 0.25f);
             float ff_z = UnityEngine.Random.Range(-0.25f, 0.25f);
+            position.x = ff_x;
+            position.z = ff_z;
+
+        } else if (areWalls == 2)
+        {
+            //position = UnityEngine.Random.insideUnitSphere * 0.25f;
+            float ff_x = UnityEngine.Random.Range(-0.5f, 0.5f);
+            float ff_z = UnityEngine.Random.Range(-0.5f, 0.5f);
             position.x = ff_x;
             position.z = ff_z;
 

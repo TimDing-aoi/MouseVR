@@ -232,7 +232,7 @@ public class BallController : MonoBehaviour
                 roll = Input.GetAxis("Horizontal");
                 xVel = roll / Time.deltaTime/100;
                 // 1 = 50 deg/s
-                // yawVel = roll / Time.deltaTime*4f;
+                yawVel = roll / Time.deltaTime * 4f;
                 //print(Time.deltaTime);
             }
             else

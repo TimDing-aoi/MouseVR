@@ -9,7 +9,7 @@ public class AccelerometerController : MonoBehaviour
 {
 
     wrmhl accel = new wrmhl();
-    public string portName = "COM7";
+    public string portName = "COM4";
     public int baudRate = 2000000;
     public int ReadTimeout = 5000;
     public int QueueLength = 1;
@@ -31,8 +31,8 @@ public class AccelerometerController : MonoBehaviour
         accelController = this;
 
         accel.set(portName, baudRate, ReadTimeout, QueueLength);
-        //accel.connect();
-
+        accel.connect();
+   
         //_serialPort = new SerialPort();
         // Change com port
         //_serialPort.PortName = "COM7";
@@ -80,6 +80,7 @@ public class AccelerometerController : MonoBehaviour
         catch (Exception e)
         {
             //UnityEngine.Debug.LogError(e);
+            //IsConnected = false;
         }
         await new WaitForUpdate();
 

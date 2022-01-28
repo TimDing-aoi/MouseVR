@@ -17,7 +17,7 @@ public class trialcount : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        message.text = string.Format("Previous Run\nGood/Total: {0}/{1}", PlayerPrefs.GetInt("Good Trials"), PlayerPrefs.GetInt("Total Trials"));
+        message.text = string.Format("Good/Total: {0}/{1}", PlayerPrefs.GetInt("Good Trials"), PlayerPrefs.GetInt("Total Trials"));
         timemessage.text = string.Format("Minutes Elapsed: {0}", SharedReward.minutes_elapsed);
     }
 }
