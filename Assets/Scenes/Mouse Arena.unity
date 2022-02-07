@@ -1831,7 +1831,7 @@ Camera:
     m_Bits: 1559
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 3
+  m_TargetDisplay: 2
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
@@ -7588,7 +7588,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 116
-  m_CollisionDetection: 1
+  m_CollisionDetection: 0
 --- !u!136 &637452191
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -9783,7 +9783,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1500
-  field of view: 60.48835
+  field of view: 58.758713
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -10256,7 +10256,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1500
-  field of view: 60.48835
+  field of view: 58.758713
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -11633,7 +11633,7 @@ Camera:
     m_Bits: 1
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 2
+  m_TargetDisplay: 3
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
@@ -11902,7 +11902,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 920656354}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.075, z: 0}
+  m_LocalPosition: {x: 0.2, y: 0.075, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 637452192}
@@ -11941,7 +11941,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1500
-  field of view: 56.212658
+  field of view: 58.758713
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -32505,7 +32505,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1920282404}
   m_LocalRotation: {x: 0, y: 0.7071068, z: -0, w: -0.7071068}
-  m_LocalPosition: {x: 0, y: 0.075, z: 0}
+  m_LocalPosition: {x: -0.2, y: 0.075, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 637452192}
@@ -32544,7 +32544,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1500
-  field of view: 56.212658
+  field of view: 58.758713
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
