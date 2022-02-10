@@ -321,6 +321,8 @@ public class RewardArena : MonoBehaviour
     private int expDur;
 
     [HideInInspector] public bool distalOn;
+    [HideInInspector] public float distalOnDur;
+    [HideInInspector] public float distalRotation;
     [HideInInspector] public float gain;
 
     //SerialPort _serialPort;
@@ -657,7 +659,9 @@ public class RewardArena : MonoBehaviour
         print(String.Format("activeMC: {0} replay: {1}", isReplay, activeMC));
 
         juiceTime = PlayerPrefs.GetFloat("Juice Time");
-        distalOn = PlayerPrefs.GetInt("Distal Object") != 5;
+        distalOn = PlayerPrefs.GetFloat("Distal Object") != 5;
+        distalOnDur = PlayerPrefs.GetFloat("Object Duration");
+        distalRotation = PlayerPrefs.GetFloat("Object Rotation");
         areWalls = (int)PlayerPrefs.GetFloat("Walls");
         maxTrials = (int)PlayerPrefs.GetFloat("Num Trials");
         expDur = (int)PlayerPrefs.GetFloat("ExpDur");
@@ -687,6 +691,8 @@ public class RewardArena : MonoBehaviour
         if (distalOn)
         {
             distalObject.SetActive(true);
+            print(distalRotation);
+             distalObject.transform.RotateAround(new Vector3(0f,0f,0f), Vector3.up, distalRotation);
         }
         else
         {
@@ -788,6 +794,18 @@ public class RewardArena : MonoBehaviour
         if (isMoving)
         {
             firefly.transform.position += move * Time.deltaTime;
+        }
+
+        print(distalOnDur);
+        if ((Time.realtimeSinceStartup - programT0) % (2 * distalOnDur) > distalOnDur && distalOnDur != 0 || !distalOn)
+        {
+            print("off");
+            distalObject.SetActive(false);
+        }
+        else
+        {
+            print("on");
+            distalObject.SetActive(true);
         }
 
         Vector2 FF2D = new Vector2(firefly.transform.position.x, firefly.transform.position.z);
