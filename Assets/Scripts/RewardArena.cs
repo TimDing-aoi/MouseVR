@@ -715,7 +715,7 @@ public class RewardArena : MonoBehaviour
         contPath = "C:\\Users\\lab\\Desktop\\Data" + "/continuous_data_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
         //print(contPath);
         // string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ, zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,TTL,Tx,Ty,Tz,Rx,Ry,Rz,head_dir";
-        string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,AccX,AccY,AccZ,GyroX,GyroY,GyroZ";
+        string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,DistalOnOff,DistalRotation";
     
         // firstLine = "n,max_v,max_w,ffv,onDuration,PosX0,PosY0,PosZ0,RotX0,RotY0,RotZ0,RotW0,ffX,ffY,ffZ,pCheckX,pCheckY,pCheckZ,rCheckX,rCheckY,rCheckZ,rCheckW,distToFF,rewarded,timeout,beginTime,checkTime,rewardTime,duration,delays,ITI";
    
@@ -796,15 +796,15 @@ public class RewardArena : MonoBehaviour
             firefly.transform.position += move * Time.deltaTime;
         }
 
-        print(distalOnDur);
+        //print(distalOnDur);
         if ((Time.realtimeSinceStartup - programT0) % (2 * distalOnDur) > distalOnDur && distalOnDur != 0 || !distalOn)
         {
-            print("off");
+            //print("off");
             distalObject.SetActive(false);
         }
         else
         {
-            print("on");
+            //print("on");
             distalObject.SetActive(true);
         }
 
@@ -1141,7 +1141,7 @@ public class RewardArena : MonoBehaviour
             //}
             if (activeMC)
                 {
-                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21}",
+                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23}",
                     trialNum,
                     Time.realtimeSinceStartup - programT0,
                     (int)currPhase,
@@ -1163,11 +1163,13 @@ public class RewardArena : MonoBehaviour
                     motionCueingController.motionCueing.frame.heave,
                     motionCueingController.motionCueing.frame.roll,
                     motionCueingController.motionCueing.frame.pitch,
-                    motionCueingController.motionCueing.frame.yaw) + "\n");
+                    motionCueingController.motionCueing.frame.yaw,
+                    distalObject.activeInHierarchy ? 1 : 0,
+                    distalRotation) + "\n");
                     //string.Join(",", labJackController.ValueAIN)) + "\n");
                 } else
                 {
-                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17}",
+                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19}",
                     trialNum,
                     Time.realtimeSinceStartup - programT0,
                     (int)currPhase,
@@ -1185,7 +1187,9 @@ public class RewardArena : MonoBehaviour
                     timedout,
                     sync_ttl,
                     head_dir,
-                    accelController.IsConnected ? accelController.reading : "NaN,NaN,NaN,NaN,NaN,NaN"
+                    accelController.IsConnected ? accelController.reading : "NaN,NaN,NaN,NaN,NaN,NaN",
+                    distalObject.activeInHierarchy ? 1 : 0,
+                    distalRotation
                     ) + "\n");
                     //string.Join(",", labJackController.ValueAIN)) + "\n");
                 }
