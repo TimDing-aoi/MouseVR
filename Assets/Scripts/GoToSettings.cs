@@ -218,7 +218,7 @@ public class GoToSettings : MonoBehaviour
         taskSelectMenu.enabled = false;
         human2DMenu.enabled = false;
         humanArenaMenu.enabled = false;
-        motionCueingMenu.enabled = false;
+        // motionCueingMenu.enabled = false;
         // set mouse menus to .enabled = false as well, whenever they get implemented
     }
 
@@ -251,6 +251,22 @@ public class GoToSettings : MonoBehaviour
                 fireflyText.text = "fixed";
                 break;
         }
+    }
+
+    public void SwitchPageRegular()
+    {
+        print(settingMenu1.name);
+        print(settingMenu2.name);
+        settingMenu1.SetActive(true);
+        settingMenu2.SetActive(false);
+    }
+
+    public void SwitchPageFF()
+    {
+        print(settingMenu1.name);
+        print(settingMenu2.name);
+        settingMenu1.SetActive(false);
+        settingMenu2.SetActive(true);
     }
 
     /// <summary>

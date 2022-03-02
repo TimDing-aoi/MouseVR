@@ -7,7 +7,7 @@
         <DistalObject>0</DistalObject>
         <ObjectHeight>2000</ObjectHeight>
         <ObjectWidth>1000</ObjectWidth>
-        <Walls>0</Walls>
+        <Walls>1</Walls>
     </Setting>
     <Setting Type="Joystick Settings">
         <Dimensions>1</Dimensions>
@@ -25,8 +25,8 @@
         <RewardZoneRadius>0.1</RewardZoneRadius>
         <MinimumFireflyDistance>0.35</MinimumFireflyDistance>
         <MaximumFireflyDistance>0.5</MaximumFireflyDistance>
-        <MinAngle>-45</MinAngle>
-        <MaxAngle>45</MaxAngle>
+        <MinAngle>-20</MinAngle>
+        <MaxAngle>20</MaxAngle>
         <JuiceTime>37</JuiceTime>
         <Ratio>1</Ratio>
         <D1>1</D1>
@@ -39,7 +39,7 @@
         <R3>0</R3>
         <R4>0</R4>
         <R5>0</R5>
-        <Timeout>20</Timeout>
+        <Timeout>30</Timeout>
         <Ramp>0</Ramp>
         <RampTime>0</RampTime>
         <RampDelay>0</RampDelay>
