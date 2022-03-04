@@ -691,7 +691,7 @@ public class RewardArena : MonoBehaviour
         if (distalOn)
         {
             distalObject.SetActive(true);
-            print(distalRotation);
+            //print(distalRotation);
             distalObject.transform.RotateAround(new Vector3(0f,0f,0f), Vector3.up, distalRotation);
         }
         else

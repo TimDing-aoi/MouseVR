@@ -255,16 +255,16 @@ public class GoToSettings : MonoBehaviour
 
     public void SwitchPageRegular()
     {
-        print(settingMenu1.name);
-        print(settingMenu2.name);
+        //print(settingMenu1.name);
+        //print(settingMenu2.name);
         settingMenu1.SetActive(true);
         settingMenu2.SetActive(false);
     }
 
     public void SwitchPageFF()
     {
-        print(settingMenu1.name);
-        print(settingMenu2.name);
+        //print(settingMenu1.name);
+        //print(settingMenu2.name);
         settingMenu1.SetActive(false);
         settingMenu2.SetActive(true);
     }
@@ -326,7 +326,7 @@ public class GoToSettings : MonoBehaviour
             }
             else
             {
-                print(obj.name);
+                //print(obj.name);
                 PlayerPrefs.SetFloat(obj.name, float.Parse(input.text));
                 if (input.text == null)
                 {
