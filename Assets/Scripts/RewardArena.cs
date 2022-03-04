@@ -692,11 +692,20 @@ public class RewardArena : MonoBehaviour
         {
             distalObject.SetActive(true);
             print(distalRotation);
-             distalObject.transform.RotateAround(new Vector3(0f,0f,0f), Vector3.up, distalRotation);
+            distalObject.transform.RotateAround(new Vector3(0f,0f,0f), Vector3.up, distalRotation);
         }
         else
         {
             distalObject.SetActive(false);
+        }
+
+        if (areWalls == 1)
+        {
+            walls.transform.RotateAround(new Vector3(0f, 0f, 0f), Vector3.up, distalRotation);
+        }
+        else if(areWalls == 2)
+        {
+            walls2.transform.RotateAround(new Vector3(0f, 0f, 0f), Vector3.up, distalRotation);
         }
 
         Vector3 point = MonitorCam.ScreenToWorldPoint(new Vector3(-900, 0.5f, 900));
@@ -790,11 +799,14 @@ public class RewardArena : MonoBehaviour
     {
         float d1 = 0;
         float d2 = 0;
+        float FFheight = PlayerPrefs.GetFloat("FFheight");
+        float FFradius = PlayerPrefs.GetFloat("FFradius");
 
         if (isMoving)
         {
             firefly.transform.position += move * Time.deltaTime;
         }
+        firefly.transform.localScale = new Vector3(0.05f * FFradius, 0.05f * FFheight, 0.05f * FFradius);
 
         //print(distalOnDur);
         if ((Time.realtimeSinceStartup - programT0) % (2 * distalOnDur) > distalOnDur && distalOnDur != 0 || !distalOn)
@@ -1944,7 +1956,8 @@ public class RewardArena : MonoBehaviour
     {
         try
         {
-            string configPath = path + "/config_" + PlayerPrefs.GetInt("Optic Flow Seed").ToString() + ".xml";
+            //string configPath = path + "/config_" + PlayerPrefs.GetInt("Optic Flow Seed").ToString() + ".xml";
+            string configPath = "C:\\Users\\lab\\Desktop\\Data" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
 
             XmlWriter xmlWriter = XmlWriter.Create(configPath);
 
@@ -2214,6 +2227,14 @@ public class RewardArena : MonoBehaviour
             xmlWriter.WriteString(PlayerPrefs.GetFloat("BuryTime").ToString());
             xmlWriter.WriteEndElement();
 
+            xmlWriter.WriteStartElement("FFradius");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("FFradius").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("FFheight");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("FFheight").ToString());
+            xmlWriter.WriteEndElement();
+
             xmlWriter.WriteEndElement();
 
             xmlWriter.WriteStartElement("Setting");
@@ -2223,8 +2244,12 @@ public class RewardArena : MonoBehaviour
             xmlWriter.WriteString(PlayerPrefs.GetString("Path"));
             xmlWriter.WriteEndElement();
 
-            xmlWriter.WriteStartElement("Mouse");
-            xmlWriter.WriteString(PlayerPrefs.GetString("Name"));
+            xmlWriter.WriteStartElement("Trainer");
+            xmlWriter.WriteString(PlayerPrefs.GetString("Trainer"));
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MouseName");
+            xmlWriter.WriteString(PlayerPrefs.GetString("MouseName"));
             xmlWriter.WriteEndElement();
 
             xmlWriter.WriteStartElement("FullON");
