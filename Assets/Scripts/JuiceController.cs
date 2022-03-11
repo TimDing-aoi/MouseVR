@@ -14,14 +14,15 @@ public class JuiceController : MonoBehaviour
 
     private bool giveJuice = true;
     public bool IsConnected = true;
-
+    private float juiceTime;
     bool keyboardmode;
+    
     // Start is called before the first frame update
     void OnEnable()
     {
         keyboardmode = (int)PlayerPrefs.GetFloat("IsKeyboard") == 1;
         juiceController = this;
-
+        juiceTime = PlayerPrefs.GetInt("Juice Time");
         _serialPort = new SerialPort();
 
         // Change com port
@@ -68,7 +69,7 @@ public class JuiceController : MonoBehaviour
         if (keyboard.spaceKey.wasReleasedThisFrame && giveJuice)
         {
             giveJuice = false;
-            GiveJuice(65);
+            GiveJuice(60);
         }
     }
 

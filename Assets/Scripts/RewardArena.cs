@@ -936,10 +936,10 @@ public class RewardArena : MonoBehaviour
             else
             {
                 // calibration does not seem to give right numbers
-                zVel = Ball.zVel*gain*3f;
+                zVel = Ball.zVel*gain;
                 yawVel = Ball.yawVel*gain;
-                xVel = Ball.xVel*gain*2.5f;
-
+                xVel = Ball.xVel*gain;
+               
                 //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
 
                 //if (autoIdx > 300 && autoGain < 1.0f)
@@ -1021,6 +1021,14 @@ public class RewardArena : MonoBehaviour
             {
                 xVel = velMin;
             }
+            else if (yawVel > 200)
+            {
+                yawVel = 200;
+            }
+            else if (yawVel < -200)
+            {
+                yawVel = -200;
+            }
             //if (areWalls == true)
             //{
             //    var vr_arena_limit = 0.25f;
@@ -1030,7 +1038,7 @@ public class RewardArena : MonoBehaviour
             //        xVel = 0;
             //        zVel = 0;
             //    }
-    
+
             //}
 
             //print(string.Format("{0}, {1}", zVel, xVel));
@@ -1038,16 +1046,16 @@ public class RewardArena : MonoBehaviour
             switch (dim)
             {
   
-                case 0:
-                    // head fixed, rotate the ball
-                    player.transform.position += player.transform.forward * zVel * Time.deltaTime;
-                    player.transform.Rotate(0.0f, yawVel * Time.deltaTime, 0.0f);
-                    break;
-
                 case 1:
                     // head free to rotate
                     //player.transform.position += new Vector3(0.0f, 0.0f, deltaZ);
                     player.transform.position += new Vector3(xVel * Time.deltaTime, 0.0f, zVel * Time.deltaTime);
+                    break;
+
+                case 2:
+                    // head fixed, rotate the ball
+                    player.transform.position += player.transform.forward * zVel * Time.deltaTime;
+                    player.transform.Rotate(0.0f, yawVel * Time.deltaTime, 0.0f);
                     break;
 
                 default:

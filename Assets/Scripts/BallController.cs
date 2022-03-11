@@ -252,15 +252,38 @@ public class BallController : MonoBehaviour
                     // calibrate once a week
                     deltaZ = pitch * -0.0085384834f;
                     deltaX = roll * -0.0093862942f;
-                    deltaYaw = yaw * 0.1713298528f*4;
+                    // ball/visual = 1
+                    deltaYaw = yaw * -0.1713298528f*4;
+                    // squeze 360 deg into 30
+                    //deltaYaw = deltaYaw * 12;
+
+                    // yaw rotation is not probably detected, so disable yaw when runing at angle
+                    //if (Math.Abs(pitch) > 0.1 || Math.Abs(roll) > 0.1)
+                    //{
+                    //    deltaYaw = 0;
+                    //}
+
+
 
                     //deltaZ = pitch * -1 * Zscale;
                     //deltaX = roll * -1 * Xscale;
                     //deltaYaw = yaw * Yawscale;
-
-                    zVel = deltaZ / Time.deltaTime;
-                    xVel = deltaX / Time.deltaTime;
-                    yawVel = deltaYaw / Time.deltaTime;
+                    yawVel = 0;
+                    zVel = 0;
+                    xVel = 0;
+                    zVel = deltaZ / Time.deltaTime*3f;
+                    xVel = deltaX / Time.deltaTime*2.5f;
+                    // rotate when mice run at angle| tan45 = 1; tan60 = 1.73; tan75 = 3.73 (30 deg forward run area)
+                    if (Math.Abs(zVel) / Math.Abs(xVel) < 2.74 & Math.Abs(zVel) > 0.015f)
+                    {
+                        yawVel = (float)Math.Sqrt(zVel * zVel + xVel * xVel) * 300;
+                        if (roll > 0)
+                        {
+                            yawVel *= -1;
+                        }
+                    }
+                    //yawVel = xVel*200;
+                    //yawVel = deltaYaw / Time.deltaTime;
                 }
             }
 
