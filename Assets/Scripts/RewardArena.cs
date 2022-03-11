@@ -691,12 +691,21 @@ public class RewardArena : MonoBehaviour
         if (distalOn)
         {
             distalObject.SetActive(true);
-            print(distalRotation);
-             distalObject.transform.RotateAround(new Vector3(0f,0f,0f), Vector3.up, distalRotation);
+            //print(distalRotation);
+            distalObject.transform.RotateAround(new Vector3(0f,0f,0f), Vector3.up, distalRotation);
         }
         else
         {
             distalObject.SetActive(false);
+        }
+
+        if (areWalls == 1)
+        {
+            walls.transform.RotateAround(new Vector3(0f, 0f, 0f), Vector3.up, distalRotation);
+        }
+        else if(areWalls == 2)
+        {
+            walls2.transform.RotateAround(new Vector3(0f, 0f, 0f), Vector3.up, distalRotation);
         }
 
         Vector3 point = MonitorCam.ScreenToWorldPoint(new Vector3(-900, 0.5f, 900));
@@ -790,11 +799,14 @@ public class RewardArena : MonoBehaviour
     {
         float d1 = 0;
         float d2 = 0;
+        float FFheight = PlayerPrefs.GetFloat("FFheight");
+        float FFradius = PlayerPrefs.GetFloat("FFradius");
 
         if (isMoving)
         {
             firefly.transform.position += move * Time.deltaTime;
         }
+        firefly.transform.localScale = new Vector3(0.05f * FFradius, 0.05f * FFheight, 0.05f * FFradius);
 
         //print(distalOnDur);
         if ((Time.realtimeSinceStartup - programT0) % (2 * distalOnDur) > distalOnDur && distalOnDur != 0 || !distalOn)
@@ -1947,6 +1959,321 @@ public class RewardArena : MonoBehaviour
 
     //    return (coords, hit);
     //}
+
+    public void SaveMetaFile()
+    {
+        try
+        {
+            //string configPath = path + "/config_" + PlayerPrefs.GetInt("Optic Flow Seed").ToString() + ".xml";
+            string configPath = "C:\\Users\\lab\\Desktop\\Data" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
+
+            XmlWriter xmlWriter = XmlWriter.Create(configPath);
+
+            xmlWriter.WriteStartDocument();
+
+            xmlWriter.WriteStartElement("Settings");
+
+            xmlWriter.WriteStartElement("Setting");
+            xmlWriter.WriteAttributeString("Type", "Optic Flow Settings");
+
+            xmlWriter.WriteStartElement("LifeSpan");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Life Span").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("DrawDistance");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Draw Distance").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Density");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Density").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("DistalObject");
+            xmlWriter.WriteString(PlayerPrefs.GetInt("Distal Object").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("ObjectHeight");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Object Height").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("ObjectWidth");
+            xmlWriter.WriteString(PlayerPrefs.GetInt("Object Width").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Walls");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Walls").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Object Duration");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Object Duration").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Object Rotation");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Object Rotation").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Setting");
+            xmlWriter.WriteAttributeString("Type", "Movement Settings");
+
+            xmlWriter.WriteStartElement("Dimensions");
+            xmlWriter.WriteString(PlayerPrefs.GetInt("Dimensions").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MinLinearSpeed");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Min Linear Speed").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MaxLinearSpeed");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Max Linear Speed").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MinAngularSpeed");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Min Angular Speed").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MaxAngularSpeed");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Max Angular Speed").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("EndTrialOnStop");
+            xmlWriter.WriteString(PlayerPrefs.GetInt("End Trial On Stop").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("VelocityThreshold");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Velocity Threshold").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("RotationThreshold");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("RotationThreshold").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Gain");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Gain").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("IsKeyboard");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("IsKeyboard").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("IsReplay");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("IsReplay").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Setting");
+            xmlWriter.WriteAttributeString("Type", "Firefly Settings");
+
+            xmlWriter.WriteStartElement("Size");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Size").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("RewardZoneRadius");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Reward Zone Radius").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MinimumFireflyDistance");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Minimum Firefly Distance").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MaximumFireflyDistance");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Maximum Firefly Distance").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MinAngle");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Min Angle").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MaxAngle");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Max Angle").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("JuiceTime");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Juice Time").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Ratio");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Ratio").ToString());
+            xmlWriter.WriteEndElement();
+
+            //xmlWriter.WriteStartElement("Reward");
+            //xmlWriter.WriteString(PlayerPrefs.GetFloat("Reward").ToString());
+            //xmlWriter.WriteEndElement();
+
+            //xmlWriter.WriteStartElement("NumberofFireflies");
+            //xmlWriter.WriteString(PlayerPrefs.GetFloat("Number of Fireflies").ToString());
+            //xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("D1");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("D1").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("D2");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("D2").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("D3");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("D3").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("D4");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("D4").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("D5");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("D5").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("R1");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("R1").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("R2");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("R2").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("R3");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("R3").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("R4");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("R4").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("R5");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("R5").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Timeout");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Timeout").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Ramp");
+            xmlWriter.WriteString(PlayerPrefs.GetInt("Ramp").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("RampTime");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Ramp Time").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("RampDelay");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Ramp Delay").ToString());
+            xmlWriter.WriteEndElement();
+
+            //xmlWriter.WriteStartElement("FireflyLifeSpan");
+            //xmlWriter.WriteString(PlayerPrefs.GetFloat("Firefly Life Span").ToString());
+            //xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MinimumWaittoCheck");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Minimum Wait to Check").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MaximumWaittoCheck");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Maximum Wait to Check").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Mean (Check)");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Mean 1").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MinimumIntertrialWait");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Minimum Intertrial Wait").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MaximumIntertrialWait");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Maximum Intertrial Wait").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Mean (Intertrial)");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Mean 2").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("OpticFlowSeed");
+            xmlWriter.WriteString(PlayerPrefs.GetInt("Optic Flow Seed").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("FireflySeed");
+            xmlWriter.WriteString(seed.ToString());
+            xmlWriter.WriteEndElement();
+
+            //xmlWriter.WriteStartElement("SwitchBehavior");
+            //xmlWriter.WriteString(PlayerPrefs.GetString("Switch Behavior"));
+            //xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Setting");
+            xmlWriter.WriteAttributeString("Type", "Moving Firefly Settings");
+
+            xmlWriter.WriteStartElement("MovingON");
+            xmlWriter.WriteString(PlayerPrefs.GetInt("Moving ON").ToString());
+            xmlWriter.WriteEndElement();
+
+            //xmlWriter.WriteStartElement("RatioMoving");
+            //xmlWriter.WriteString(PlayerPrefs.GetFloat("Ratio Moving").ToString());
+            //xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("VertHor");
+            xmlWriter.WriteString(PlayerPrefs.GetInt("VertHor").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("V1");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("V1").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("V2");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("V2").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("VR1");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("VR1").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("BuryTime");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("BuryTime").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("FFradius");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("FFradius").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("FFheight");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("FFheight").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Setting");
+            xmlWriter.WriteAttributeString("Type", "Data Collection Settings");
+
+            xmlWriter.WriteStartElement("Path");
+            xmlWriter.WriteString(PlayerPrefs.GetString("Path"));
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("Trainer");
+            xmlWriter.WriteString(PlayerPrefs.GetString("Trainer"));
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("MouseName");
+            xmlWriter.WriteString(PlayerPrefs.GetString("MouseName"));
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("FullON");
+            xmlWriter.WriteString(PlayerPrefs.GetInt("Full ON").ToString());
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteEndDocument();
+            xmlWriter.Close();
+        }
+        catch (Exception e)
+        {
+            UnityEngine.Debug.LogError(e);
+        }
+    }
 
     /// <summary>
     /// If you provide filepaths beforehand, the program will save all of your data as .csv files.

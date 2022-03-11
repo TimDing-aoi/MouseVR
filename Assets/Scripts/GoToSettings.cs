@@ -218,7 +218,7 @@ public class GoToSettings : MonoBehaviour
         taskSelectMenu.enabled = false;
         human2DMenu.enabled = false;
         humanArenaMenu.enabled = false;
-        motionCueingMenu.enabled = false;
+        // motionCueingMenu.enabled = false;
         // set mouse menus to .enabled = false as well, whenever they get implemented
     }
 
@@ -251,6 +251,22 @@ public class GoToSettings : MonoBehaviour
                 fireflyText.text = "fixed";
                 break;
         }
+    }
+
+    public void SwitchPageRegular()
+    {
+        //print(settingMenu1.name);
+        //print(settingMenu2.name);
+        settingMenu1.SetActive(true);
+        settingMenu2.SetActive(false);
+    }
+
+    public void SwitchPageFF()
+    {
+        //print(settingMenu1.name);
+        //print(settingMenu2.name);
+        settingMenu1.SetActive(false);
+        settingMenu2.SetActive(true);
     }
 
     /// <summary>
@@ -302,7 +318,7 @@ public class GoToSettings : MonoBehaviour
                 //string temp = input.text;
                 //PlayerPrefs.SetString(obj.name, input.text);
             }
-            else if (obj.name == "Name" || obj.name == "Date")
+            else if (obj.name == "MouseName" || obj.name == "Trainer" || obj.name == "Date")
             {
                 string temp = input.text;
              
@@ -310,6 +326,7 @@ public class GoToSettings : MonoBehaviour
             }
             else
             {
+                //print(obj.name);
                 PlayerPrefs.SetFloat(obj.name, float.Parse(input.text));
                 if (input.text == null)
                 {
@@ -578,21 +595,6 @@ public class GoToSettings : MonoBehaviour
                                     }
                                 }
                             }
-                            //else if (children.name == "VertHor")
-                            //{
-                            //    TMP_InputField field = children.GetComponent<TMP_InputField>();
-                            //    foreach (XmlNode node in doc.DocumentElement.ChildNodes)
-                            //    {
-                            //        foreach (XmlNode setting in node.ChildNodes)
-                            //        {
-                            //            if (setting.Name == children.name.Replace(" ", ""))
-                            //            {
-                            //                field.text = setting.InnerText;
-                            //                PlayerPrefs.SetInt(children.name, int.Parse(field.text));
-                            //            }
-                            //        }
-                            //    }
-                            //}
                             else if (children.name == "Path")
                             {
                                 TMP_InputField field = children.GetComponent<TMP_InputField>();
@@ -676,87 +678,69 @@ public class GoToSettings : MonoBehaviour
             XmlDocument doc = new XmlDocument();
             doc.Load(path[0]);
 
-            if (settingMenu1.activeInHierarchy)
+            foreach (Transform child in settingMenu1.transform)
             {
-                foreach (Transform child in settingMenu1.transform)
+                foreach (Transform children in child)
                 {
-                    foreach (Transform children in child)
+                    if (children.gameObject.CompareTag("Setting"))
                     {
-                        if (children.gameObject.CompareTag("Setting"))
+                        if (children.name == "Distal Object" || children.name == "Dimensions")
                         {
-                            if (children.name == "Eye Mode" || children.name == "FP Mode" || children.name == "Distal Object" || children.name == "Dimensions")
+                            TMP_Dropdown drop = children.GetComponent<TMP_Dropdown>();
+                            foreach (XmlNode node in doc.DocumentElement.ChildNodes)
                             {
-                                TMP_Dropdown drop = children.GetComponent<TMP_Dropdown>();
-                                foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                                foreach (XmlNode setting in node.ChildNodes)
                                 {
-                                    foreach (XmlNode setting in node.ChildNodes)
+                                    if (setting.Name == children.name.Replace(" ", ""))
                                     {
-                                        if (setting.Name == children.name.Replace(" ", ""))
-                                        {
-                                            drop.value = int.Parse(setting.InnerText);
-                                            PlayerPrefs.SetInt(children.name, drop.value);
-                                        }
+                                        drop.value = int.Parse(setting.InnerText);
+                                        PlayerPrefs.SetInt(children.name, drop.value);
                                     }
                                 }
                             }
-                            else if (children.name == "Perturbation On" || children.name == "Moving ON" || children.name == "Feedback ON" || children.name == "AboveBelow" || children.name == "VertHor" || children.name == "Full ON" || children.name == "End Trial On Stop" || children.name == "Ramp")
+                        }
+                        else if (children.name == "Moving ON" || children.name == "VertHor" || children.name == "End Trial On Stop")
+                        {
+                            UnityEngine.UI.Toggle toggle = children.GetComponent<UnityEngine.UI.Toggle>();
+                            foreach (XmlNode node in doc.DocumentElement.ChildNodes)
                             {
-                                UnityEngine.UI.Toggle toggle = children.GetComponent<UnityEngine.UI.Toggle>();
-                                foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                                foreach (XmlNode setting in node.ChildNodes)
                                 {
-                                    foreach (XmlNode setting in node.ChildNodes)
+                                    if (setting.Name == children.name.Replace(" ", ""))
                                     {
-                                        if (setting.Name == children.name.Replace(" ", ""))
-                                        {
-                                            toggle.isOn = int.Parse(setting.InnerText) == 1;
-                                            PlayerPrefs.SetInt(children.name, toggle.isOn ? 1 : 0);
-                                        }
+                                        toggle.isOn = int.Parse(setting.InnerText) == 1;
+                                        PlayerPrefs.SetInt(children.name, toggle.isOn ? 1 : 0);
                                     }
                                 }
                             }
-                            //else if (children.name == "VertHor")
-                            //{
-                            //    TMP_InputField field = children.GetComponent<TMP_InputField>();
-                            //    foreach (XmlNode node in doc.DocumentElement.ChildNodes)
-                            //    {
-                            //        foreach (XmlNode setting in node.ChildNodes)
-                            //        {
-                            //            if (setting.Name == children.name.Replace(" ", ""))
-                            //            {
-                            //                field.text = setting.InnerText;
-                            //                PlayerPrefs.SetInt(children.name, int.Parse(field.text));
-                            //            }
-                            //        }
-                            //    }
-                            //}
-                            else if (children.name == "Path")
+                        }
+                        else if (children.name == "Path")
+                        {
+                            TMP_InputField field = children.GetComponent<TMP_InputField>();
+                            foreach (XmlNode node in doc.DocumentElement.ChildNodes)
                             {
-                                TMP_InputField field = children.GetComponent<TMP_InputField>();
-                                foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                                foreach (XmlNode setting in node.ChildNodes)
                                 {
-                                    foreach (XmlNode setting in node.ChildNodes)
+                                    if (setting.Name == children.name.Replace(" ", ""))
                                     {
-                                        if (setting.Name == children.name.Replace(" ", ""))
-                                        {
-                                            field.text = setting.InnerText;
-                                            PlayerPrefs.SetString(children.name, field.text);
-                                        }
+                                        field.text = setting.InnerText;
+                                        PlayerPrefs.SetString(children.name, field.text);
                                     }
                                 }
                             }
-                            else
+                        }
+                        else
+                        {
+                            TMP_InputField field = children.GetComponent<TMP_InputField>();
+                            foreach (XmlNode node in doc.DocumentElement.ChildNodes)
                             {
-                                TMP_InputField field = children.GetComponent<TMP_InputField>();
-                                foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                                foreach (XmlNode setting in node.ChildNodes)
                                 {
-                                    foreach (XmlNode setting in node.ChildNodes)
+                                    if (setting.Name == children.name.Replace(" ", ""))
                                     {
-                                        if (setting.Name == children.name.Replace(" ", ""))
-                                        {
-                                            //print(setting.Name);
-                                            field.text = setting.InnerText;
-                                            PlayerPrefs.SetFloat(children.name, float.Parse(field.text));
-                                        }
+                                        print(setting.Name);
+                                        field.text = setting.InnerText;
+                                        PlayerPrefs.SetFloat(children.name, float.Parse(field.text));
                                     }
                                 }
                             }
@@ -764,34 +748,90 @@ public class GoToSettings : MonoBehaviour
                     }
                 }
             }
-            else if (settingMenu2.activeInHierarchy)
+            settingMenu1.SetActive(false);
+            settingMenu2.SetActive(true);
+
+            foreach (Transform child in settingMenu2.transform)
             {
-                foreach (Transform child in settingMenu2.transform)
+                foreach (Transform children in child)
                 {
-                    if (child.gameObject.CompareTag("Setting"))
+                    if (children.gameObject.CompareTag("Setting"))
                     {
-                        TMP_InputField field = child.GetComponent<TMP_InputField>();
-                        foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                        if (children.name == "To Be Added")
                         {
-                            foreach (XmlNode setting in node.ChildNodes)
+                            TMP_Dropdown drop = children.GetComponent<TMP_Dropdown>();
+                            foreach (XmlNode node in doc.DocumentElement.ChildNodes)
                             {
-                                if (setting.Name == child.name.Replace(" ", ""))
+                                foreach (XmlNode setting in node.ChildNodes)
                                 {
-                                    field.text = setting.InnerText;
-                                    if (child.name == "Optic Flow Seed" || child.name == "Firefly Seed")
+                                    if (setting.Name == children.name.Replace(" ", ""))
                                     {
-                                        PlayerPrefs.SetInt(child.name, int.Parse(field.text));
-                                        print(PlayerPrefs.GetInt(child.name));
+                                        drop.value = int.Parse(setting.InnerText);
+                                        PlayerPrefs.SetInt(children.name, drop.value);
                                     }
-                                    else
+                                }
+                            }
+                        }
+                        else if (children.name == "Ramp")
+                        {
+                            UnityEngine.UI.Toggle toggle = children.GetComponent<UnityEngine.UI.Toggle>();
+                            foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                            {
+                                foreach (XmlNode setting in node.ChildNodes)
+                                {
+                                    if (setting.Name == children.name.Replace(" ", ""))
                                     {
-                                        PlayerPrefs.SetFloat(child.name, float.Parse(field.text));
+                                        toggle.isOn = int.Parse(setting.InnerText) == 1;
+                                        PlayerPrefs.SetInt(children.name, toggle.isOn ? 1 : 0);
+                                    }
+                                }
+                            }
+                        }
+                        else if (children.name == "To Be Added")
+                        {
+                            TMP_InputField field = children.GetComponent<TMP_InputField>();
+                            foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                            {
+                                foreach (XmlNode setting in node.ChildNodes)
+                                {
+                                    if (setting.Name == children.name.Replace(" ", ""))
+                                    {
+                                        field.text = setting.InnerText;
+                                        PlayerPrefs.SetString(children.name, field.text);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            TMP_InputField field = children.GetComponent<TMP_InputField>();
+                            foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                            {
+                                foreach (XmlNode setting in node.ChildNodes)
+                                {
+                                    if (setting.Name == children.name.Replace(" ", ""))
+                                    {
+                                        //print(setting.Name);
+                                        field.text = setting.InnerText;
+                                        PlayerPrefs.SetFloat(children.name, float.Parse(field.text));
                                     }
                                 }
                             }
                         }
                     }
                 }
+            }
+            settingMenu1.SetActive(true);
+            settingMenu2.SetActive(false);
+
+            if (settingMenu1.activeInHierarchy)
+            {
+                
+            }
+
+            if (settingMenu2.activeInHierarchy)
+            {
+                
             }
         }
         catch (Exception e)
