@@ -176,6 +176,9 @@ public class RewardArena : MonoBehaviour
     readonly List<string> ffPos_frame = new List<string>();
     readonly List<Vector3> ffPositions = new List<Vector3>();
 
+
+    float FFheight;
+    float FFradius;
     //// Player position at Check()
     //readonly List<string> cPos = new List<string>();
 
@@ -304,7 +307,7 @@ public class RewardArena : MonoBehaviour
     private float roll;
     private float yaw;
 
-    public int dim;
+    public float yaw_flag;
 
     private float deltaX;
     private float deltaZ;
@@ -511,7 +514,7 @@ public class RewardArena : MonoBehaviour
 
         rotMin = PlayerPrefs.GetFloat("Min Angular Speed");
         rotMax = PlayerPrefs.GetFloat("Max Angular Speed");
-        dim = PlayerPrefs.GetInt("Dimensions"); // 0 = 1D (F/B), 1 = 2D (L/R/F/B), 2 - yaw rot
+        yaw_flag = PlayerPrefs.GetFloat("Yaw"); // 0 = 1D (F/B), 1 = 2D (L/R/F/B), 2 - yaw rot
      
         minDrawDistance = PlayerPrefs.GetFloat("Minimum Firefly Distance");
         maxDrawDistance = PlayerPrefs.GetFloat("Maximum Firefly Distance");
@@ -535,6 +538,10 @@ public class RewardArena : MonoBehaviour
         firefly.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
         ratio = PlayerPrefs.GetFloat("Ratio");
         ramp = PlayerPrefs.GetInt("Ramp") == 1;
+
+        //FF size scale factor
+        FFheight = PlayerPrefs.GetFloat("FFheight");
+        FFradius = PlayerPrefs.GetFloat("FFradius");
 
         buryTime = PlayerPrefs.GetFloat("BuryTime");
 
@@ -799,8 +806,6 @@ public class RewardArena : MonoBehaviour
     {
         float d1 = 0;
         float d2 = 0;
-        float FFheight = PlayerPrefs.GetFloat("FFheight");
-        float FFradius = PlayerPrefs.GetFloat("FFradius");
 
         if (isMoving)
         {
@@ -948,10 +953,10 @@ public class RewardArena : MonoBehaviour
             else
             {
                 // calibration does not seem to give right numbers
-                zVel = Ball.zVel*gain;
+                zVel = Ball.zVel*gain*3f;
                 yawVel = Ball.yawVel*gain;
-                xVel = Ball.xVel*gain;
-               
+                xVel = Ball.xVel*gain*2.5f;
+
                 //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
 
                 //if (autoIdx > 300 && autoGain < 1.0f)
@@ -1033,14 +1038,6 @@ public class RewardArena : MonoBehaviour
             {
                 xVel = velMin;
             }
-            else if (yawVel > 200)
-            {
-                yawVel = 200;
-            }
-            else if (yawVel < -200)
-            {
-                yawVel = -200;
-            }
             //if (areWalls == true)
             //{
             //    var vr_arena_limit = 0.25f;
@@ -1050,21 +1047,21 @@ public class RewardArena : MonoBehaviour
             //        xVel = 0;
             //        zVel = 0;
             //    }
-
+    
             //}
 
             //print(string.Format("{0}, {1}", zVel, xVel));
 
-            switch (dim)
+            switch ((int)yaw_flag)
             {
   
-                case 1:
+                case 0:
                     // head free to rotate
                     //player.transform.position += new Vector3(0.0f, 0.0f, deltaZ);
                     player.transform.position += new Vector3(xVel * Time.deltaTime, 0.0f, zVel * Time.deltaTime);
                     break;
 
-                case 2:
+                case 1:
                     // head fixed, rotate the ball
                     player.transform.position += player.transform.forward * zVel * Time.deltaTime;
                     player.transform.Rotate(0.0f, yawVel * Time.deltaTime, 0.0f);
@@ -1240,7 +1237,7 @@ public class RewardArena : MonoBehaviour
             File.AppendAllText(contPath, sb.ToString());
             sb.Clear();
 
-            //Save();
+            SaveMetaFile();
 
 
             SceneManager.LoadScene("MainMenu");
@@ -1419,7 +1416,7 @@ public class RewardArena : MonoBehaviour
         }
         else
         {
-            if (dim == 1 & head_dir > 3)
+            if (yaw_flag == 0 & head_dir > 3)
             {
                 position = (player.transform.position - new Vector3(0.0f, p_height, 0.0f)) + Quaternion.AngleAxis(angle + head_dir, Vector3.up) * player.transform.forward * R;
             } else
@@ -2017,8 +2014,8 @@ public class RewardArena : MonoBehaviour
             xmlWriter.WriteStartElement("Setting");
             xmlWriter.WriteAttributeString("Type", "Movement Settings");
 
-            xmlWriter.WriteStartElement("Dimensions");
-            xmlWriter.WriteString(PlayerPrefs.GetInt("Dimensions").ToString());
+            xmlWriter.WriteStartElement("Yaw");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("Yaw").ToString());
             xmlWriter.WriteEndElement();
 
             xmlWriter.WriteStartElement("MinLinearSpeed");
