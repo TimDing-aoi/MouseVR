@@ -277,6 +277,8 @@ public class BallController : MonoBehaviour
                     if (Math.Abs(zVel) / Math.Abs(xVel) < 2.74 & Math.Abs(zVel) > 0.015f)
                     {
                         yawVel = (float)Math.Sqrt(zVel * zVel + xVel * xVel) * 300;
+                        zVel = 0;
+                        xVel = 0;
                         if (roll > 0)
                         {
                             yawVel *= -1;

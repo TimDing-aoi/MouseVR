@@ -953,9 +953,9 @@ public class RewardArena : MonoBehaviour
             else
             {
                 // calibration does not seem to give right numbers
-                zVel = Ball.zVel*gain*3f;
+                zVel = Ball.zVel*gain;
                 yawVel = Ball.yawVel*gain;
-                xVel = Ball.xVel*gain*2.5f;
+                xVel = Ball.xVel*gain;
 
                 //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
 
@@ -2001,11 +2001,11 @@ public class RewardArena : MonoBehaviour
             xmlWriter.WriteString(PlayerPrefs.GetFloat("Walls").ToString());
             xmlWriter.WriteEndElement();
 
-            xmlWriter.WriteStartElement("Object Duration");
+            xmlWriter.WriteStartElement("ObjectDuration");
             xmlWriter.WriteString(PlayerPrefs.GetFloat("Object Duration").ToString());
             xmlWriter.WriteEndElement();
 
-            xmlWriter.WriteStartElement("Object Rotation");
+            xmlWriter.WriteStartElement("ObjectRotation");
             xmlWriter.WriteString(PlayerPrefs.GetFloat("Object Rotation").ToString());
             xmlWriter.WriteEndElement();
 
@@ -2171,7 +2171,7 @@ public class RewardArena : MonoBehaviour
             xmlWriter.WriteString(PlayerPrefs.GetFloat("Maximum Wait to Check").ToString());
             xmlWriter.WriteEndElement();
 
-            xmlWriter.WriteStartElement("Mean (Check)");
+            xmlWriter.WriteStartElement("MeanCheck");
             xmlWriter.WriteString(PlayerPrefs.GetFloat("Mean 1").ToString());
             xmlWriter.WriteEndElement();
 
@@ -2183,7 +2183,7 @@ public class RewardArena : MonoBehaviour
             xmlWriter.WriteString(PlayerPrefs.GetFloat("Maximum Intertrial Wait").ToString());
             xmlWriter.WriteEndElement();
 
-            xmlWriter.WriteStartElement("Mean (Intertrial)");
+            xmlWriter.WriteStartElement("MeanIntertrial");
             xmlWriter.WriteString(PlayerPrefs.GetFloat("Mean 2").ToString());
             xmlWriter.WriteEndElement();
 

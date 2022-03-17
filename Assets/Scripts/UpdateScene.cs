@@ -51,7 +51,7 @@ public class UpdateScene : MonoBehaviour
         SharedReward.velMax = PlayerPrefs.GetFloat("Max Linear Speed");
         SharedReward.rotMin = PlayerPrefs.GetFloat("Min Angular Speed");
         SharedReward.rotMax = PlayerPrefs.GetFloat("Max Angular Speed");
-        SharedReward.dim = PlayerPrefs.GetInt("Dimensions");
+    
         SharedReward.minDrawDistance = PlayerPrefs.GetFloat("Minimum Firefly Distance");
         SharedReward.maxDrawDistance = PlayerPrefs.GetFloat("Maximum Firefly Distance");
         SharedReward.LR = PlayerPrefs.GetFloat("Left Right");
