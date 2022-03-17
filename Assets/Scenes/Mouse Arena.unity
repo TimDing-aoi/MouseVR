@@ -30504,6 +30504,7 @@ MonoBehaviour:
   MainCamera: {fileID: 1624449817}
   MonitorCam: {fileID: 1205283420}
   Menu: {fileID: 0}
+  mouseCams: {fileID: 637452189}
   fireflySize: 0
   fireflyZoneRadius: 0
   mode: 0
@@ -30551,7 +30552,7 @@ MonoBehaviour:
   ramp: 0
   rampTime: 0
   rampDelay: 0
-  dim: 0
+  yaw_flag: 0
   distalOn: 0
   distalOnDur: 0
   distalRotation: 0

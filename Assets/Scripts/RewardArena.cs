@@ -65,6 +65,7 @@ public class RewardArena : MonoBehaviour
     public GameObject MainCamera;
     public Camera MonitorCam;
     public GameObject Menu;
+    public GameObject mouseCams;
     [Tooltip("Radius of firefly")]
     [HideInInspector] public float fireflySize;
     [Tooltip("Maximum distance allowed from center of firefly")]
@@ -1246,7 +1247,7 @@ public class RewardArena : MonoBehaviour
 
             SaveMetaFile();
 
-
+            mouseCams.SetActive(false);
             SceneManager.LoadScene("MainMenu");
 
         }
