@@ -160,6 +160,7 @@ public class RewardArena : MonoBehaviour
     
     private Vector3 pPos;
     private bool isTimeout = false;
+    private bool bury_start = false;
 
     // Trial number
     //readonly List<int> trial = new List<int>();
@@ -845,8 +846,14 @@ public class RewardArena : MonoBehaviour
 
         //Debug.Log(string.Format("Player {0}", player.transform.position));
 
-        
-        if (buryTime > 0 && firefly.transform.position.y > -0.051)
+        Vector3 difference_vector = player.transform.position - firefly.transform.position;
+        float ff_dir = Mathf.Atan2(difference_vector.z, difference_vector.x);
+        float ff_head_diff = Mathf.Abs(ff_dir - head_dir);
+        if(ff_head_diff < 45 && currPhase == Phases.trial)
+        {
+            bury_start = true;
+        }
+        if (buryTime > 0 && firefly.transform.position.y > -0.051 && bury_start)
         {
             float buryspeed = 0.1f / (buryTime * 50);
             firefly.transform.Translate(0, - buryspeed, 0);
@@ -1715,6 +1722,7 @@ public class RewardArena : MonoBehaviour
         string ffPosStr = "";
         float wait = 0.0f;
         bool isReward = true;
+        bury_start = false;
 
         //Vector3 pos = new Vector3();
         //Quaternion rot = new Quaternion();
