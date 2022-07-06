@@ -58,7 +58,7 @@ public class LabJackController : MonoBehaviour
             //}
 
             //Set DAC0 to 2.5 volts.
-            LJUD.AddRequest(u3.ljhandle, LJUD.IO.PUT_DAC, 0, 1.9, 0, 0);
+            LJUD.AddRequest(u3.ljhandle, LJUD.IO.PUT_DAC, 0, 2.5, 0, 0);
 
             LJUD.GoOne(u3.ljhandle);
         }

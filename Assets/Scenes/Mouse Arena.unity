@@ -30551,7 +30551,9 @@ MonoBehaviour:
   ramp: 0
   rampTime: 0
   rampDelay: 0
-  dim: 0
+  yaw_flag: 0
+  motorYaw: 0
+  motorRoll: 0
   distalOn: 0
   distalOnDur: 0
   distalRotation: 0
@@ -30687,6 +30689,8 @@ MonoBehaviour:
   roll: 0
   yaw: 0
   yawCopy: 0
+  motorYaw: 0
+  motorRoll: 0
   deltaX: 0
   deltaZ: 0
   deltaYaw: 0

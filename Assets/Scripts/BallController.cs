@@ -16,6 +16,9 @@ public class BallController : MonoBehaviour
     [HideInInspector] public float yaw;
     [HideInInspector] public float yawCopy;
 
+    [HideInInspector] public float motorYaw;
+    [HideInInspector] public float motorRoll;
+
     [HideInInspector] public float deltaX;
     [HideInInspector] public float deltaZ;
     [HideInInspector] public float deltaYaw;
@@ -59,6 +62,8 @@ public class BallController : MonoBehaviour
     void Start()
     {
         keyboard = (int)PlayerPrefs.GetFloat("IsKeyboard") == 1;
+        motorYaw = PlayerPrefs.GetFloat("motorYaw"); // 0 = 1D (F/B), 1 = 2D (L/R/F/B), 2 - yaw rot
+        motorRoll = PlayerPrefs.GetFloat("motorRoll"); // 0 = 1D (F/B), 1 = 2D (L/R/F/B), 2 - yaw rot
 
         Ball = this;
         ball.set(portName, baudRate, ReadTimeout, QueueLength);
@@ -73,7 +78,7 @@ public class BallController : MonoBehaviour
 
         // calibration
         Zscale = PlayerPrefs.GetFloat("ZScale") == 0 ? 1 : PlayerPrefs.GetFloat("ZScale");
-        Xscale = PlayerPrefs.GetFloat("XScale") == 0 ? 1 : PlayerPrefs.GetFloat("ZScale");
+        Xscale = PlayerPrefs.GetFloat("XScale") == 0 ? 1 : PlayerPrefs.GetFloat("XScale");
         Yawscale = PlayerPrefs.GetFloat("YawScale") == 0 ? 1 : PlayerPrefs.GetFloat("YawScale");
 
 
@@ -256,36 +261,59 @@ public class BallController : MonoBehaviour
                     deltaYaw = yaw * -0.1713298528f*4;
                     // squeze 360 deg into 30
                     //deltaYaw = deltaYaw * 12;
+              
 
-                    // yaw rotation is not probably detected, so disable yaw when runing at angle
-                    //if (Math.Abs(pitch) > 0.1 || Math.Abs(roll) > 0.1)
-                    //{
-                    //    deltaYaw = 0;
-                    //}
+                    if (motorYaw > 0)
+                    {
+                        
+                        // yaw rotation is not probably detected, so disable yaw when runing at angle
+                        if (Math.Abs(pitch) > 0.05)
+                        {
+                            deltaYaw = 0;
+                        }
+                        yawVel = deltaYaw / Time.deltaTime;
+                    }
+
 
 
 
                     //deltaZ = pitch * -1 * Zscale;
                     //deltaX = roll * -1 * Xscale;
                     //deltaYaw = yaw * Yawscale;
-                    yawVel = 0;
-                    zVel = 0;
-                    xVel = 0;
-                    zVel = deltaZ / Time.deltaTime*3f;
-                    xVel = deltaX / Time.deltaTime*2.5f;
-                    // rotate when mice run at angle| tan45 = 1; tan60 = 1.73; tan75 = 3.73 (30 deg forward run area)
-                    if (Math.Abs(zVel) / Math.Abs(xVel) < 2.74 & Math.Abs(zVel) > 0.015f)
+
+                    zVel = deltaZ / Time.deltaTime * 3f * Zscale;
+                    xVel = deltaX / Time.deltaTime * 2.5f * Xscale;
+
+                    if (motorRoll > 0)
                     {
-                        yawVel = (float)Math.Sqrt(zVel * zVel + xVel * xVel) * 300;
-                        zVel = 0;
-                        xVel = 0;
-                        if (roll > 0)
+                        yawVel = 0;
+                        //zVel = 0;
+                        //xVel = 0;
+                        // rotate when mice run at angle| tan45 = 1; tan60 = 1.73; tan75 = 3.73 (30 deg forward run area)
+                        if (Math.Abs(zVel) / Math.Abs(xVel) < 2.73 & Math.Abs(xVel) > 0.015f)
+                            //if (Math.Abs(roll) > 0.03f)
                         {
-                            yawVel *= -1;
+                            //yawVel = (float)Math.Sqrt(zVel * zVel + xVel * xVel) * 300;
+                            // roll and pitch combination is not symmetric, so that running at angle might be different for various angles
+                            if (xVel > 0)
+                            {
+                                // roll or deltaX is not symmetric, not sure why;
+                                yawVel = xVel * 600;
+                            } else
+                            {
+                                yawVel = xVel * 300;
+                            }
+
+                            
+                            zVel = 0;
+                            xVel = 0;
+               
                         }
                     }
-                    //yawVel = xVel*200;
-                    //yawVel = deltaYaw / Time.deltaTime;
+                    
+               
+
+
                 }
             }
 

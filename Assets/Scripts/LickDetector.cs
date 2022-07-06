@@ -33,7 +33,7 @@ public class LickDetector : MonoBehaviour
 
         if (!keyboard)
         {
-            bb.connect();
+            //bb.connect();
         }
 
     }
@@ -44,7 +44,7 @@ public class LickDetector : MonoBehaviour
         
         try
         {
-            TTL = int.Parse(bb.readQueue());
+            //TTL = int.Parse(bb.readQueue());
             //print(TTL);
         }
         catch (Exception e)
@@ -57,11 +57,11 @@ public class LickDetector : MonoBehaviour
 
     private void OnDisable()
     {
-        bb.close();
+        //bb.close();
     }
 
     private void OnApplicationQuit()
     {
-        bb.close();
+        //bb.close();
     }
 }

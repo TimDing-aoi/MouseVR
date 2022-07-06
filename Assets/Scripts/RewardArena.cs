@@ -290,7 +290,7 @@ public class RewardArena : MonoBehaviour
     public Vector3 player_origin;
 
     private string contPath;
-
+    private string configPath;
     //private int loopCount = 0;
 
     private StringBuilder sb = new StringBuilder();
@@ -309,6 +309,8 @@ public class RewardArena : MonoBehaviour
     private float yaw;
 
     public float yaw_flag;
+    public float motorYaw;
+    public float motorRoll;
 
     private float deltaX;
     private float deltaZ;
@@ -383,6 +385,7 @@ public class RewardArena : MonoBehaviour
     // replay settings
     bool isReplay;
 
+    public int session_starttime;
     public int minutes_elapsed;
     //string replayPath;
     //readonly List<float> replayX = new List<float>();
@@ -424,6 +427,8 @@ public class RewardArena : MonoBehaviour
     /// </summary>
     void Start()
     {
+        session_starttime = (int)Time.realtimeSinceStartup;
+
         QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 50;
         //Physics2D.autoSimulation = false;
@@ -515,8 +520,18 @@ public class RewardArena : MonoBehaviour
 
         rotMin = PlayerPrefs.GetFloat("Min Angular Speed");
         rotMax = PlayerPrefs.GetFloat("Max Angular Speed");
-        yaw_flag = PlayerPrefs.GetFloat("Yaw"); // 0 = 1D (F/B), 1 = 2D (L/R/F/B), 2 - yaw rot
-     
+
+        motorYaw = PlayerPrefs.GetFloat("motorYaw"); // 0 = 1D (F/B), 1 = 2D (L/R/F/B), 2 - yaw rot
+        motorRoll = PlayerPrefs.GetFloat("motorRoll"); // 0 = 1D (F/B), 1 = 2D (L/R/F/B), 2 - yaw rot
+
+        if (motorYaw > 0 || motorRoll > 0)
+        {
+            yaw_flag = 1;
+        } else
+        {
+            yaw_flag = 0;
+        }
+        Debug.Log(yaw_flag);
         minDrawDistance = PlayerPrefs.GetFloat("Minimum Firefly Distance");
         maxDrawDistance = PlayerPrefs.GetFloat("Maximum Firefly Distance");
         LR = PlayerPrefs.GetFloat("Left Right");
@@ -655,9 +670,10 @@ public class RewardArena : MonoBehaviour
         velThresh = PlayerPrefs.GetFloat("Velocity Threshold");
         rotThresh = PlayerPrefs.GetFloat("Rotation Threshold");
         gain = PlayerPrefs.GetFloat("Gain");
+        gain = PlayerPrefs.GetFloat("Gain");
 
         path = PlayerPrefs.GetString("Path");
-        mouseID = PlayerPrefs.GetString("Name");
+        mouseID = PlayerPrefs.GetString("MouseName");
         date = PlayerPrefs.GetString("Date");
 
         //print(string.Format(" Mouse id = {0}, Date = {1}, Path = {2}", mouseID, date, path));
@@ -728,8 +744,11 @@ public class RewardArena : MonoBehaviour
 
         player.transform.position = new Vector3(0.0f, p_height, 0.0f);
         player.transform.rotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
+        firefly.transform.localScale = new Vector3(0.05f * FFradius, 0.05f * FFheight, 0.05f * FFradius);
+
         //print("Begin test.");
-        contPath = "C:\\Users\\lab\\Desktop\\Data" + "/continuous_data_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
+        contPath = "C:\\Users\\lab\\Desktop\\TrainData" + "/cd" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
+        configPath = "C:\\Users\\lab\\Desktop\\TrainData" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
         //print(contPath);
         // string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ, zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,TTL,Tx,Ty,Tz,Rx,Ry,Rz,head_dir";
         string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,DistalOnOff,DistalRotation";
@@ -812,7 +831,7 @@ public class RewardArena : MonoBehaviour
         {
             firefly.transform.position += move * Time.deltaTime;
         }
-        firefly.transform.localScale = new Vector3(0.05f * FFradius, 0.05f * FFheight, 0.05f * FFradius);
+        
 
         //print(distalOnDur);
         if ((Time.realtimeSinceStartup - programT0) % (2 * distalOnDur) > distalOnDur && distalOnDur != 0 || !distalOn)
@@ -846,10 +865,24 @@ public class RewardArena : MonoBehaviour
 
         //Debug.Log(string.Format("Player {0}", player.transform.position));
 
+      
+
         Vector3 difference_vector = player.transform.position - firefly.transform.position;
-        float ff_dir = Mathf.Atan2(difference_vector.z, difference_vector.x);
-        float ff_head_diff = Mathf.Abs(ff_dir - head_dir);
-        if(ff_head_diff < 45 && currPhase == Phases.trial)
+        float ff_dir = Mathf.Atan2(difference_vector.x, difference_vector.z ) * Mathf.Rad2Deg + 180;
+        float ff_head_diff;
+        if (yaw_flag != 0)
+        {
+             ff_head_diff = ff_dir - player.transform.eulerAngles.y;
+        } else
+        {
+             ff_head_diff = ff_dir - head_dir;
+        }
+        
+        ff_head_diff += (ff_head_diff > 180) ? -360 : (ff_head_diff < -180) ? 360 : 0;
+
+        //Debug.Log(ff_head_diff);
+
+        if(Math.Abs(ff_head_diff) < 45 && currPhase == Phases.trial)
         {
             bury_start = true;
         }
@@ -1045,6 +1078,14 @@ public class RewardArena : MonoBehaviour
             {
                 xVel = velMin;
             }
+            else if (yawVel > rotMax)
+            {
+                yawVel = rotMax;
+            }
+            else if (yawVel < rotMin)
+            {
+                yawVel = rotMin;
+            }
             //if (areWalls == true)
             //{
             //    var vr_arena_limit = 0.25f;
@@ -1054,7 +1095,7 @@ public class RewardArena : MonoBehaviour
             //        xVel = 0;
             //        zVel = 0;
             //    }
-    
+
             //}
 
             //print(string.Format("{0}, {1}", zVel, xVel));
@@ -1107,8 +1148,9 @@ public class RewardArena : MonoBehaviour
 
 
 
-
+            // in m/s
             var p_speed = (float)Math.Sqrt(zVel* zVel + xVel * xVel);
+            // in cm/s
             m_DataDiagram.InputPoint(lineList[0], new Vector2(1, p_speed*100));
             // 6 deg bins
             m_DataDiagram.InputPoint(lineList[1], new Vector2(1, head_dir/6));
@@ -1282,7 +1324,7 @@ public class RewardArena : MonoBehaviour
 
         idx++;
 
-        minutes_elapsed = (int)Time.realtimeSinceStartup;
+        minutes_elapsed = (int)Time.time - session_starttime;
 
     }
 
@@ -1970,7 +2012,7 @@ public class RewardArena : MonoBehaviour
         try
         {
             //string configPath = path + "/config_" + PlayerPrefs.GetInt("Optic Flow Seed").ToString() + ".xml";
-            string configPath = "C:\\Users\\lab\\Desktop\\Data" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
+            
 
             XmlWriter xmlWriter = XmlWriter.Create(configPath);
 
@@ -2022,8 +2064,13 @@ public class RewardArena : MonoBehaviour
             xmlWriter.WriteStartElement("Setting");
             xmlWriter.WriteAttributeString("Type", "Movement Settings");
 
-            xmlWriter.WriteStartElement("Yaw");
-            xmlWriter.WriteString(PlayerPrefs.GetFloat("Yaw").ToString());
+            xmlWriter.WriteStartElement("motorYaw");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("motorYaw").ToString());
+
+            xmlWriter.WriteEndElement();
+
+            xmlWriter.WriteStartElement("motorRoll");
+            xmlWriter.WriteString(PlayerPrefs.GetFloat("motorRoll").ToString());
             xmlWriter.WriteEndElement();
 
             xmlWriter.WriteStartElement("MinLinearSpeed");

@@ -26,11 +26,11 @@ public class MotorController : MonoBehaviour
     //public int QueueLength = 1;
     //public string portName = "COM10";
     //public int baudRate = 2000000;
-    public List<Dictionary<string, object>> data;
+    //public List<Dictionary<string, object>> data;
     float roll = 0.0f;
     float yaw = 0.0f;
     int idx = 0;
-    bool flagReceived = true;
+    //bool flagReceived = true;
     // Start is called before the first frame update
 
 
@@ -247,6 +247,7 @@ public class MotorController : MonoBehaviour
 
     private void OnApplicationQuit()
     {
+        labJackController.ExecuteDACRequest(2.5f);
         //if (_serialPort.IsOpen)
         //{
         //    _serialPort.Close();
