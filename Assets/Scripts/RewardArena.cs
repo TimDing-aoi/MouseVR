@@ -327,6 +327,10 @@ public class RewardArena : MonoBehaviour
     private int maxTrials;
     private int expDur;
 
+    private int ttl = 0;
+    private int headDirection = 0;
+    private int updatesCounter = 0;
+
     [HideInInspector] public bool distalOn;
     [HideInInspector] public float distalOnDur;
     [HideInInspector] public float distalRotation;
@@ -1326,6 +1330,20 @@ public class RewardArena : MonoBehaviour
         idx++;
 
         minutes_elapsed = (int)Time.time - session_starttime;
+
+        updatesCounter++;
+
+
+
+        if (updatesCounter == 1)
+        {
+            PlayerPrefs.SetInt("Updates Counter", 0);
+        }
+        if (updatesCounter % 100 == 0)
+        {
+            
+            PlayerPrefs.SetInt("Updates Counter", updatesCounter/100);
+        }
 
     }
 
