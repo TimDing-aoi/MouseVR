@@ -65,7 +65,7 @@ public class RewardArena : MonoBehaviour
     public GameObject MainCamera;
     public Camera MonitorCam;
     public GameObject Menu;
-    public GameObject mouseCams;
+
     [Tooltip("Radius of firefly")]
     [HideInInspector] public float fireflySize;
     [Tooltip("Maximum distance allowed from center of firefly")]
@@ -752,8 +752,8 @@ public class RewardArena : MonoBehaviour
         firefly.transform.localScale = new Vector3(0.05f * FFradius, 0.05f * FFheight, 0.05f * FFradius);
 
         //print("Begin test.");
-        contPath = "C:\\Users\\lab\\Desktop\\TrainData" + "/cd" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
-        configPath = "C:\\Users\\lab\\Desktop\\TrainData" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
+        contPath = "C:\\Users\\lab\\Desktop\\RecData" + "/cd" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
+        configPath = "C:\\Users\\lab\\Desktop\\RecData" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
         //print(contPath);
         // string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ, zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,TTL,Tx,Ty,Tz,Rx,Ry,Rz,head_dir";
         string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,DistalOnOff,DistalRotation";
@@ -1342,7 +1342,7 @@ public class RewardArena : MonoBehaviour
 
             SaveMetaFile();
 
-            mouseCams.SetActive(false);
+        
             SceneManager.LoadScene("MainMenu");
 
         }
