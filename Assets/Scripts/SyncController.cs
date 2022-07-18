@@ -43,7 +43,7 @@ public class SyncController : MonoBehaviour
         try
         {
             TTL = int.Parse(sync.readQueue());
-            //Debug.Log(TTL);
+            Debug.Log(TTL);
         }
         catch (Exception e)
         {
