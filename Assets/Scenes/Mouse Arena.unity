@@ -8273,6 +8273,7 @@ MonoBehaviour:
   dir: 0
   reading: 
   IsConnected: 1
+  updatesCounter: 0
 --- !u!4 &695607494
 Transform:
   m_ObjectHideFlags: 0
@@ -8365,6 +8366,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 696513946}
   m_CullTransparentMesh: 0
+--- !u!1 &697009337
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 697009339}
+  - component: {fileID: 697009338}
+  m_Layer: 0
+  m_Name: TTL Sensor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &697009338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 697009337}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bd27c9d694d2d3449b8f7004d36e90a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  portName: COM3
+  baudRate: 2000000
+  ReadTimeout: 5000
+  QueueLength: 1
+  reading: 
+  ttlValue: 0
+--- !u!4 &697009339
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 697009337}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 255.16003, y: 126.84108, z: 215.48642}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 30
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &698983223
 GameObject:
   m_ObjectHideFlags: 0
@@ -29044,12 +29094,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e447e591b02d2049bbd41967ee13195, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TTL: 0
-  IsConnected: 1
-  ReadTimeout: 5000
-  QueueLength: 1
   portName: COM3
   baudRate: 2000000
+  ReadTimeout: 5000
+  QueueLength: 1
+  TTL: 0
+  IsConnected: 1
+  updatesCounter: 0
 --- !u!4 &1610389792
 Transform:
   m_ObjectHideFlags: 0
@@ -30752,7 +30803,6 @@ MonoBehaviour:
   MainCamera: {fileID: 1624449817}
   MonitorCam: {fileID: 1205283420}
   Menu: {fileID: 0}
-  mouseCams: {fileID: 0}
   fireflySize: 0
   fireflyZoneRadius: 0
   mode: 0
@@ -31604,7 +31654,7 @@ MonoBehaviour:
   m_firstVisibleCharacter: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -154.1835, w: 0}
+  m_margin: {x: 0, y: 0, z: -306.66275, w: 0}
   m_textInfo:
     textComponent: {fileID: 1786368177}
     characterCount: 15

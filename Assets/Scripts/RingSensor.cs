@@ -22,62 +22,71 @@ public class RingSensor : MonoBehaviour
     public bool IsConnected = true;
     float dt = 0.0f;
 
+    public int updatesCounter = 0;
+
     bool keyboard;
 
     // Start is called before the first frame update
     void Start()
     {
+        PlayerPrefs.SetString("Ring State", "Connected");
         keyboard = (int)PlayerPrefs.GetFloat("IsKeyboard") == 1;
 
         ringSensor = this;
 
         ring.set(portName, baudRate, ReadTimeout, QueueLength);
 
-        if (!keyboard)
-        {
+        
+
+        //if (!keyboard)
+        //{
             ring.connect();
-        }
+        //}
     }
 
     // Update is called once per frame
     public async void Update()
     {
-   
-        try
+
+        updatesCounter++;
+
+        if (updatesCounter % 100 == 0)
         {
-            reading = ring.readQueue();
+            try
+            {
+                reading = ring.readQueue();
 
-            //string[] line = reading.Split(',');
+                //string[] line = reading.Split(',');
 
-            dir = float.Parse(reading);
-        
+                dir = float.Parse(reading);
 
-            //Debug.Log(dt - float.Parse(line[6]));
-            //Debug.Log(Time.deltaTime);
-            //dt = float.Parse(line[6]);
-            //print(accX);
+                PlayerPrefs.SetString("Ring State", "Connected");
+                //Debug.Log(dt - float.Parse(line[6]));
+                //Debug.Log(Time.deltaTime);
+                //dt = float.Parse(line[6]);
+                //print(accX);
 
+            }
+            catch (Exception e)
+            {
+                //UnityEngine.Debug.LogError(e);
+                PlayerPrefs.SetString("Ring State", "Disonnected");
+            }
         }
-        catch (Exception e)
-        {
-            //UnityEngine.Debug.LogError(e);
-        }
+
+
+
         await new WaitForUpdate();
 
     }
 
     private void OnDisable()
     {
-        //_serialPort.Close();
         ring.close();
     }
 
     private void OnApplicationQuit()
     {
-        //if (_serialPort.IsOpen)
-        //{
-        //    //_serialPort.Close();
-        //}
         ring.close();
     }
 }
