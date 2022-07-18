@@ -9,46 +9,61 @@ using System.Linq;
 public class SyncController : MonoBehaviour
 {
     wrmhl sync = new wrmhl();
+    public string portName = "COM3";
+    public int baudRate = 2000000;
+    public int ReadTimeout = 5000;
+    public int QueueLength = 1;
+
     public static SyncController syncController;
   
     public int TTL;
     public bool IsConnected = true;
 
-    public int ReadTimeout = 5000;
-    public int QueueLength = 1;
-    public string portName = "COM3";
-    public int baudRate = 2000000;
+
+
+
+    public int updatesCounter = 0;
 
     bool keyboard;
 
     // Start is called before the first frame update
     void Start()
     {
+        PlayerPrefs.SetString("TTL State", "Connected");
         keyboard = (int)PlayerPrefs.GetFloat("IsKeyboard") == 1;
 
         syncController = this;
 
         sync.set(portName, baudRate, ReadTimeout, QueueLength);
-        if (!keyboard)
-        {
-            sync.connect();
-        }
+        //if (!keyboard)
+        //{
+        sync.connect();
+        //}
+
 
     }
 
     // Update is called once per frame
     public async void Update()
     {
-        
-        try
+        updatesCounter++;
+        TTL = int.Parse(sync.readQueue());
+
+        if (updatesCounter % 100 == 0)
         {
-            TTL = int.Parse(sync.readQueue());
-            Debug.Log(TTL);
+            try
+            {
+                
+                PlayerPrefs.SetString("TTL State", "Connected");
+
+            }
+            catch (Exception e)
+            {
+                PlayerPrefs.SetString("TTL State", "Disconnected");
+
+            }
         }
-        catch (Exception e)
-        {
-            //Debug.LogWarning(e);
-        }
+
         await new WaitForUpdate();
 
     }

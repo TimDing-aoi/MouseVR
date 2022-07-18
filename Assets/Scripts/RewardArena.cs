@@ -327,6 +327,10 @@ public class RewardArena : MonoBehaviour
     private int maxTrials;
     private int expDur;
 
+    private int ttl = 0;
+    private int headDirection = 0;
+    private int updatesCounter = 0;
+
     [HideInInspector] public bool distalOn;
     [HideInInspector] public float distalOnDur;
     [HideInInspector] public float distalRotation;
@@ -403,6 +407,8 @@ public class RewardArena : MonoBehaviour
     private bool m_IsContinueInput = false;
     private float m_Input = 0f;
     private float h = 0;
+
+
 
 
     void AddALine()
@@ -795,6 +801,53 @@ public class RewardArena : MonoBehaviour
         //File.WriteAllText("C:\\Users\\jc10487\\Documents\\timingTest.txt", stringBuilder.ToString());
     }
 
+    private void makeWallsInvisible()
+    {
+        if (areWalls == 1)
+        {
+            for (int i = 0; i < walls.transform.childCount; i++)
+            {
+                GameObject child = walls.transform.GetChild(i).gameObject;
+                child.GetComponent<Renderer>().enabled = false;
+            }
+
+        }
+        if (areWalls == 2)
+        {
+            for (int i = 0; i < walls2.transform.childCount; i++)
+            {
+                GameObject child = walls2.transform.GetChild(i).gameObject;
+                child.GetComponent<Renderer>().enabled = false;
+            }
+
+        }
+
+    }
+
+    private void makeWallsVisible()
+    {
+        if (areWalls == 1)
+        {
+            for (int i = 0; i < walls.transform.childCount; i++)
+            {
+                GameObject child = walls.transform.GetChild(i).gameObject;
+                child.GetComponent<Renderer>().enabled = true;
+            }
+
+        }
+        if (areWalls == 2)
+        {
+            for (int i = 0; i < walls2.transform.childCount; i++)
+            {
+                GameObject child = walls2.transform.GetChild(i).gameObject;
+                child.GetComponent<Renderer>().enabled = true;
+            }
+
+        }
+
+    }
+
+
     /// <summary>
     /// Update is called once per frame
     /// 
@@ -834,16 +887,18 @@ public class RewardArena : MonoBehaviour
         }
         
 
-        //print(distalOnDur);
+        // The object and walls will toggle on and off with a (2 * object_duration) period
         if ((Time.realtimeSinceStartup - programT0) % (2 * distalOnDur) > distalOnDur && distalOnDur != 0 || !distalOn)
         {
-            //print("off");
             distalObject.SetActive(false);
+            makeWallsInvisible();
+
         }
         else
         {
-            //print("on");
             distalObject.SetActive(true);
+            makeWallsVisible();
+
         }
 
         Vector2 FF2D = new Vector2(firefly.transform.position.x, firefly.transform.position.z);
@@ -1326,6 +1381,20 @@ public class RewardArena : MonoBehaviour
         idx++;
 
         minutes_elapsed = (int)Time.time - session_starttime;
+
+        updatesCounter++;
+
+
+
+        if (updatesCounter == 1)
+        {
+            PlayerPrefs.SetInt("Updates Counter", 0);
+        }
+        if (updatesCounter % 100 == 0)
+        {
+            
+            PlayerPrefs.SetInt("Updates Counter", updatesCounter/100);
+        }
 
     }
 
