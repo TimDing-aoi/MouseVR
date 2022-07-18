@@ -32,47 +32,56 @@ public class RingSensor : MonoBehaviour
         PlayerPrefs.SetString("Ring State", "Connected");
         keyboard = (int)PlayerPrefs.GetFloat("IsKeyboard") == 1;
 
+        updatesCounter = 0;
+
         ringSensor = this;
 
         ring.set(portName, baudRate, ReadTimeout, QueueLength);
 
         
 
-        //if (!keyboard)
-        //{
+        if (!keyboard)
+        {
             ring.connect();
-        //}
+        }
     }
 
     // Update is called once per frame
     public async void Update()
     {
 
-        updatesCounter++;
+        
 
-        if (updatesCounter % 100 == 0)
+        try
         {
-            try
-            {
-                reading = ring.readQueue();
+            reading = ring.readQueue();
 
-                //string[] line = reading.Split(',');
+            //string[] line = reading.Split(',');
 
-                dir = float.Parse(reading);
+            dir = float.Parse(reading);
 
-                PlayerPrefs.SetString("Ring State", "Connected");
-                //Debug.Log(dt - float.Parse(line[6]));
-                //Debug.Log(Time.deltaTime);
-                //dt = float.Parse(line[6]);
-                //print(accX);
+            updatesCounter = 0;
 
-            }
-            catch (Exception e)
-            {
-                //UnityEngine.Debug.LogError(e);
-                PlayerPrefs.SetString("Ring State", "Disonnected");
-            }
+            //if (updatesCounter % 100 == 0)
+            //{
+            //    PlayerPrefs.SetString("Ring State", "Connected");
+            //}
+
+
+            //Debug.Log(dt - float.Parse(line[6]));
+            //Debug.Log(Time.deltaTime);
+            //dt = float.Parse(line[6]);
+            //print(accX);
+
         }
+        catch (Exception e)
+        {
+            //UnityEngine.Debug.LogError(e);
+            updatesCounter++;
+            if (updatesCounter % 100 == 0)
+                PlayerPrefs.SetString("Ring State", "Disonnected");
+        }
+
 
 
 

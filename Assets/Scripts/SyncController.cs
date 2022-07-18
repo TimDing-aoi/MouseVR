@@ -32,13 +32,15 @@ public class SyncController : MonoBehaviour
         PlayerPrefs.SetString("TTL State", "Connected");
         keyboard = (int)PlayerPrefs.GetFloat("IsKeyboard") == 1;
 
+        updatesCounter = 0;
+
         syncController = this;
 
         sync.set(portName, baudRate, ReadTimeout, QueueLength);
-        //if (!keyboard)
-        //{
-        sync.connect();
-        //}
+        if (!keyboard)
+        {
+            sync.connect();
+        }
 
 
     }
@@ -46,23 +48,28 @@ public class SyncController : MonoBehaviour
     // Update is called once per frame
     public async void Update()
     {
-        updatesCounter++;
-        TTL = int.Parse(sync.readQueue());
 
-        if (updatesCounter % 100 == 0)
+        
+
+
+        try
         {
-            try
-            {
-                
-                PlayerPrefs.SetString("TTL State", "Connected");
+            TTL = int.Parse(sync.readQueue());
+            updatesCounter = 0;
+            //if (updatesCounter % 100 == 0)
+            //{
+            //    PlayerPrefs.SetString("TTL State", "Connected");
+            //}
 
-            }
-            catch (Exception e)
-            {
+        }
+        catch (Exception e)
+        {
+            updatesCounter++;
+            if (updatesCounter % 100 == 0)
                 PlayerPrefs.SetString("TTL State", "Disconnected");
 
-            }
         }
+
 
         await new WaitForUpdate();
 
