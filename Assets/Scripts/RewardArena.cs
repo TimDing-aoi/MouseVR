@@ -330,6 +330,7 @@ public class RewardArena : MonoBehaviour
     private int ttl = 0;
     private int headDirection = 0;
     private int updatesCounter = 0;
+    private int isVisionOff = 0;
 
     [HideInInspector] public bool distalOn;
     [HideInInspector] public float distalOnDur;
@@ -696,12 +697,14 @@ public class RewardArena : MonoBehaviour
         areWalls = (int)PlayerPrefs.GetFloat("Walls");
         maxTrials = (int)PlayerPrefs.GetFloat("Num Trials");
         expDur = (int)PlayerPrefs.GetFloat("ExpDur");
+        isVisionOff = (int)PlayerPrefs.GetFloat("Vision Off");
+
         //for (int i = 0; i < 3; i++)
         //{
         //    GameObject child = walls.transform.GetChild(i).gameObject;
         //    child.GetComponent<MeshRenderer>().enabled = false;
         //}
-     
+
         // mesh renderer for inv walls
         if (areWalls == 1)
         {
@@ -756,6 +759,8 @@ public class RewardArena : MonoBehaviour
         //print("Begin test.");
         contPath = "C:\\Users\\lab\\Desktop\\RecData" + "/cd" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
         configPath = "C:\\Users\\lab\\Desktop\\RecData" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
+
+
         //print(contPath);
         // string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ, zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,TTL,Tx,Ty,Tz,Rx,Ry,Rz,head_dir";
         string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,DistalOnOff,DistalRotation";
@@ -1330,21 +1335,29 @@ public class RewardArena : MonoBehaviour
             //phase = Phases.shutdown;
             playing = false;
 
+            isVisionOff = 1;
+
+
             //motionCueingController.IsStop = true;
             if (activeMC)
             {
                 await motionCueingController.StopMovement();
             }
-            
+
+
             PlayerPrefs.SetInt("Good Trials", goodTrials);
             PlayerPrefs.SetInt("Total Trials", trialNum - 1);
             // Environment.Exit(Environment.ExitCode);
+
             File.AppendAllText(contPath, sb.ToString());
             sb.Clear();
 
             SaveMetaFile();
 
-        
+
+            await new WaitForSeconds(3.0f);
+
+
             SceneManager.LoadScene("MainMenu");
 
         }
@@ -1394,6 +1407,17 @@ public class RewardArena : MonoBehaviour
         {
             
             PlayerPrefs.SetInt("Updates Counter", updatesCounter/100);
+        }
+
+        if (isVisionOff != 0)
+        {
+            distalObject.SetActive(false);
+            makeWallsInvisible();
+            firefly.SetActive(false);
+            var emission = particleSystem.emission;
+            emission.enabled = false;
+
+
         }
 
     }
