@@ -218,7 +218,7 @@ public class GoToSettings : MonoBehaviour
         taskSelectMenu.enabled = false;
         human2DMenu.enabled = false;
         humanArenaMenu.enabled = false;
-        // motionCueingMenu.enabled = false;
+        motionCueingMenu.enabled = false;
         // set mouse menus to .enabled = false as well, whenever they get implemented
     }
 
