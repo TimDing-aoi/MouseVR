@@ -5,6 +5,7 @@ using System.IO.Ports;
 using UnityEngine;
 using static BallController;
 using static LabJackController;
+using static MotionCueingController;
 
 [DisallowMultipleComponent]
 public class MotorController : MonoBehaviour
@@ -76,9 +77,17 @@ public class MotorController : MonoBehaviour
     // Update is called once per frame
     public async void Update()
     {
-
+        if ((int)PlayerPrefs.GetFloat("Enable MC") == 1)
+        {
+            yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
+            Debug.Log("using yawVel from MC ----------------------------------------");
+        }
+        else
+        {
+            yawVel = Ball.yawVel;
+        }
         // 1.9 = 0 V
-        yawVel = Ball.yawVel;
+        
         //print(yawVel);
         //yawVel = deltaYaw / Time.deltaTime;
         yawVel /= yawVelMax;
@@ -128,7 +137,7 @@ public class MotorController : MonoBehaviour
         //    }
         //}
 
-
+        /*--------------------------------------------------------
 
         // -1, 1 min, max ang vel
         if (yawVel > 1)
@@ -140,6 +149,8 @@ public class MotorController : MonoBehaviour
         {
             yawVel = -1.0f;
         }
+        
+        --------------------------------------------------------*/
 
         value = yawVel * 2.5f + 2.5f;
         //serialController.SendSerialMessage(idx.ToString());

@@ -757,8 +757,11 @@ public class RewardArena : MonoBehaviour
         firefly.transform.localScale = new Vector3(0.05f * FFradius, 0.05f * FFheight, 0.05f * FFradius);
 
         //print("Begin test.");
-        contPath = "C:\\Users\\lab\\Desktop\\RecData" + "/cd" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
-        configPath = "C:\\Users\\lab\\Desktop\\RecData" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
+        //contPath = "C:\\Users\\lab\\Desktop\\TrainData" + "/cd_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
+        //configPath = "C:\\Users\\lab\\Desktop\\TrainData" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
+
+        contPath = "C:\\Users\\lab\\Desktop\\2022_08_04" + "/cd_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
+        configPath = "C:\\Users\\lab\\Desktop\\2022_08_04" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
 
 
         //print(contPath);
@@ -1266,9 +1269,11 @@ public class RewardArena : MonoBehaviour
             //{
             //    onoff.Add(firefly.activeInHierarchy);
             //}
+            activeMC = true;
             if (activeMC)
                 {
-                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23}",
+                Debug.Log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22}",
                     trialNum,
                     Time.realtimeSinceStartup - programT0,
                     (int)currPhase,
@@ -1293,7 +1298,8 @@ public class RewardArena : MonoBehaviour
                     motionCueingController.motionCueing.frame.yaw,
                     distalObject.activeInHierarchy ? 1 : 0,
                     distalRotation) + "\n");
-                    //string.Join(",", labJackController.ValueAIN)) + "\n");
+                //string.Join(",", labJackController.ValueAIN)) + "\n");
+                Debug.Log("bbbbbbbbbbbbbbbbbbbbbb");
                 } else
                 {
                     sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19}",

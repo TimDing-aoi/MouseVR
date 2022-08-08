@@ -232,13 +232,17 @@ public class BallController : MonoBehaviour
             else if (keyboard)
             {
                 pitch = Input.GetAxis("Vertical");
-                zVel = pitch / Time.deltaTime/100;
+                zVel = pitch / Time.deltaTime/20/5/5;
+
+
 
                 roll = Input.GetAxis("Horizontal");
-                xVel = roll / Time.deltaTime/100;
+                xVel = roll / Time.deltaTime/20/5;
+
+
                 // 1 = 50 deg/s
-                yawVel = roll / Time.deltaTime * 4f;
-                //print(Time.deltaTime);
+                yawVel = roll / Time.deltaTime;
+
             }
             else
             {

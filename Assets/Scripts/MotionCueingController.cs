@@ -1,6 +1,6 @@
 ﻿#undef USING_100HZ
 //#define TEST
-//#define ACTIVE
+#define ACTIVE
 
 using System;
 using System.Collections;
@@ -18,6 +18,7 @@ using UnityEngine.InputSystem;
 
 public class MotionCueingController : MonoBehaviour
 {
+    public static float freq = 50;
     public bool test;
     public bool active;
 
@@ -235,14 +236,14 @@ public class MotionCueingController : MonoBehaviour
 #if USING_100HZ
         currentTask = motionCueing.ConfigureERTT(0.01f, 0, 1, 15, 0); // Send CFG#ERTT...
 #else
-        currentTask = motionCueing.ConfigureERTT(1f / 60f, 0, 1, 15, 0); // Send CFG#ERTT...
+        currentTask = motionCueing.ConfigureERTT(1f / freq, 0, 1, 15, 0); // Send CFG#ERTT...
 #endif
         await new WaitUntil(() => currentTask.IsCompleted);
 
         motionCueing.ConnectERTT();
 
         currentTask = motionCueing.ControlOff(); // Send CONTROLOFF, DISABLE
-
+         
         await new WaitUntil(() => currentTask.IsCompleted);
 
         currentTask = motionCueing.ControlOn(); // Send CONTROLON, ENABLE
@@ -431,7 +432,7 @@ public class MotionCueingController : MonoBehaviour
 #if USING_100HZ
         currentTask = motionCueing.ConfigureERTT(0.01f, 0, 1, 15, 0); // Send CFG#ERTT...
 #else
-        currentTask = motionCueing.ConfigureERTT(1f / 60f, 0, 1, 15, 0); // Send CFG#ERTT...
+        currentTask = motionCueing.ConfigureERTT(1f / freq, 0, 1, 15, 0); // Send CFG#ERTT...
 #endif
         await new WaitUntil(() => currentTask.IsCompleted);
 
@@ -504,117 +505,117 @@ public class CMotionCueing : IDisposable
             public double yaw;
         }
     #if USING_100HZ
-        [DllImport("MotionCueing_100.dll")] static private extern IntPtr Create();
+        [DllImport("MotionCueing_50.dll")] static private extern IntPtr Create();
 
-        [DllImport("MotionCUeing_100.dll")] static private extern void Destroy(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static private extern void Destroy(IntPtr pObj);
 
-        [DllImport("MotionCueing_100.dll")] static public extern void CallUpdateParameters(IntPtr pObj, IntPtr gpList);
+        [DllImport("MotionCueing_50.dll")] static public extern void CallUpdateParameters(IntPtr pObj, IntPtr gpList);
 
-        [DllImport("MotionCueing_100.dll")] static public extern void CallResetLastMoogXYVel(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern void CallResetLastMoogXYVel(IntPtr pObj);
 
-        [DllImport("MotionCueing_100.dll")] static public extern void CallCalculation(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern void CallCalculation(IntPtr pObj);
 
-        [DllImport("MotionCueing_100.dll")] static public extern void CallImportInputs(IntPtr pObj, double ball_x, double ball_y, double ball_yaw, double moog_yaw, double arena_radius, double avoidance_radius);
+        [DllImport("MotionCueing_50.dll")] static public extern void CallImportInputs(IntPtr pObj, double ball_x, double ball_y, double ball_yaw, double moog_yaw, double arena_radius, double avoidance_radius);
 
-        [DllImport("MotionCueing_100.dll")] static public extern float GetHeave(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetHeave(IntPtr pObj);
 
-        [DllImport("MotionCueing_100.dll")] static public extern float GetSurge(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetSurge(IntPtr pObj);
 
-        [DllImport("MotionCueing_100.dll")] static public extern float GetLateral(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetLateral(IntPtr pObj);
 
-        [DllImport("MotionCueing_100.dll")] static public extern float GetYaw(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetYaw(IntPtr pObj);
 
-        [DllImport("MotionCueing_100.dll")] static public extern float GetPitch(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetPitch(IntPtr pObj);
 
-        [DllImport("MotionCueing_100.dll")] static public extern float GetRoll(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetRoll(IntPtr pObj);
     #else
-        [DllImport("MotionCueing_60.dll")] static private extern IntPtr Create(double limit1, double limit2, double limit3, double limit4, double limit5, double limit6, double maxX, double maxY, double maxRot);
+        [DllImport("MotionCueing_50.dll")] static private extern IntPtr Create(double limit1, double limit2, double limit3, double limit4, double limit5, double limit6, double maxX, double maxY, double maxRot);
 
-        [DllImport("MotionCueing_60.dll")] static private extern void Destroy(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static private extern void Destroy(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern void CallUpdateParameters(IntPtr pObj, IntPtr gpList);
+        [DllImport("MotionCueing_50.dll")] static public extern void CallUpdateParameters(IntPtr pObj, IntPtr gpList);
 
-        [DllImport("MotionCueing_60.dll")] static public extern void CallResetLastMoogXYVel(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern void CallResetLastMoogXYVel(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern void CallCalculation(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern void CallCalculation(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern void CallImportInputs(IntPtr pObj, double ball_x, double ball_y, double ball_yaw, double moog_yaw, double arena_radius, double avoidance_radius);
+        [DllImport("MotionCueing_50.dll")] static public extern void CallImportInputs(IntPtr pObj, double ball_x, double ball_y, double ball_yaw, double moog_yaw, double arena_radius, double avoidance_radius);
 
-        [DllImport("MotionCueing_60.dll")] static public extern float GetHeave(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetHeave(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern float GetSurge(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetSurge(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern float GetLateral(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetLateral(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern float GetYaw(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetYaw(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern float GetPitch(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetPitch(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern float GetRoll(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern float GetRoll(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern double GetLimitOne(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetLimitOne(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern double GetLimitTwo(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetLimitTwo(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern double GetLimitThree(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetLimitThree(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern double GetLimitFour(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetLimitFour(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern double GetLimitFive(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetLimitFive(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern double GetLimitSix(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetLimitSix(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern double GetBallMaxX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetBallMaxX(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern double GetBallMaxY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetBallMaxY(IntPtr pObj);
 
-        [DllImport("MotionCueing_60.dll")] static public extern double GetBallMaxRot(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetVRPosX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetVRPosY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetVRGIAErrorX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetVRGIAErrorY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetRatGIAX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetRatGIAY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetRatXGIAErrorX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetRatXGIAErrorY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetDesiredMoogAccX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetDesiredMoogAccY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCInternalVariable0X(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCInternalVariable0Y(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCInternalVariable1X(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCInternalVariable1Y(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCInternalVariable2X(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCInternalVariable2Y(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCAccX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCAccY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCTiltPosX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCTiltPosY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCTiltVelX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCTiltVelY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCTiltAccX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMCTiltAccY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogAccX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogAccY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogVelX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogVelY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogPosX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogPosY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogTiltAccX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogTiltAccY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogTiltVelX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogTiltVelY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogTiltPosX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetMoogTiltPosY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetFinalMoogVelX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetFinalMoogVelY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetFinalMoogAccX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetFinalMoogAccY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetFinalMoogGIAX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetFinalMoogGIAY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetRatGIAErrorX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetRatGIAErrorY(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetFinalVRVelX(IntPtr pObj);
-        [DllImport("MotionCueing_60.dll")] static public extern double GetFinalVRVelY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetBallMaxRot(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetVRPosX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetVRPosY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetVRGIAErrorX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetVRGIAErrorY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetRatGIAX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetRatGIAY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetRatXGIAErrorX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetRatXGIAErrorY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetDesiredMoogAccX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetDesiredMoogAccY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCInternalVariable0X(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCInternalVariable0Y(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCInternalVariable1X(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCInternalVariable1Y(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCInternalVariable2X(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCInternalVariable2Y(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCAccX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCAccY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCTiltPosX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCTiltPosY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCTiltVelX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCTiltVelY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCTiltAccX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMCTiltAccY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogAccX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogAccY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogVelX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogVelY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogPosX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogPosY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogTiltAccX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogTiltAccY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogTiltVelX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogTiltVelY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogTiltPosX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetMoogTiltPosY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetFinalMoogVelX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetFinalMoogVelY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetFinalMoogAccX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetFinalMoogAccY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetFinalMoogGIAX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetFinalMoogGIAY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetRatGIAErrorX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetRatGIAErrorY(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetFinalVRVelX(IntPtr pObj);
+        [DllImport("MotionCueing_50.dll")] static public extern double GetFinalVRVelY(IntPtr pObj);
 
 #endif
         //private string address;

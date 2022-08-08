@@ -1775,7 +1775,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &144655380
 Transform:
   m_ObjectHideFlags: 0
@@ -8395,12 +8395,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3bd27c9d694d2d3449b8f7004d36e90a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portName: COM3
-  baudRate: 2000000
-  ReadTimeout: 5000
-  QueueLength: 1
-  reading: 
-  ttlValue: 0
 --- !u!4 &697009339
 Transform:
   m_ObjectHideFlags: 0
@@ -9926,7 +9920,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1500
-  field of view: 56.357418
+  field of view: 58.04296
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -9935,7 +9929,7 @@ Camera:
     m_Bits: 23
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
+  m_TargetDisplay: 3
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
@@ -10555,7 +10549,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1500
-  field of view: 56.357418
+  field of view: 58.04296
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -10564,7 +10558,7 @@ Camera:
     m_Bits: 1
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 7
+  m_TargetDisplay: 5
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
@@ -11200,7 +11194,7 @@ PrefabInstance:
     - target: {fileID: 5571769396048836206, guid: ccfef8edadd006a48b378ec5468ea18c,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5571769396048836207, guid: ccfef8edadd006a48b378ec5468ea18c,
         type: 3}
@@ -11875,7 +11869,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &909636084
 Transform:
   m_ObjectHideFlags: 0
@@ -12240,7 +12234,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1500
-  field of view: 56.357418
+  field of view: 58.04296
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -12249,7 +12243,7 @@ Camera:
     m_Bits: 1559
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 6
+  m_TargetDisplay: 4
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
@@ -33052,7 +33046,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1500
-  field of view: 56.357418
+  field of view: 58.04296
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -33300,7 +33294,7 @@ Camera:
     m_Bits: 551
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 5
+  m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
