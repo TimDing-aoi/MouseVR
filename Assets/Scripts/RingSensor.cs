@@ -79,7 +79,7 @@ public class RingSensor : MonoBehaviour
             //UnityEngine.Debug.LogError(e);
             updatesCounter++;
             if (updatesCounter % 100 == 0)
-                PlayerPrefs.SetString("Ring State", "Disonnected");
+                PlayerPrefs.SetString("Ring State", "Disconnected");
         }
 
 

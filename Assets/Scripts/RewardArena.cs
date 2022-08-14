@@ -766,10 +766,11 @@ public class RewardArena : MonoBehaviour
 
         //print(contPath);
         // string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ, zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,TTL,Tx,Ty,Tz,Rx,Ry,Rz,head_dir";
-        string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,DistalOnOff,DistalRotation";
-    
+        string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,AccZ,AccY,AccX,GyroX,GyroY,GyroZ,DistalOnOff,DistalRotation,surge,lateral,heave,roll,pitch,yaw";
+
+        //string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,DistalOnOff,DistalRotation";
         // firstLine = "n,max_v,max_w,ffv,onDuration,PosX0,PosY0,PosZ0,RotX0,RotY0,RotZ0,RotW0,ffX,ffY,ffZ,pCheckX,pCheckY,pCheckZ,rCheckX,rCheckY,rCheckZ,rCheckW,distToFF,rewarded,timeout,beginTime,checkTime,rewardTime,duration,delays,ITI";
-   
+
         File.AppendAllText(contPath, firstLine + "\n");
 
         programT0 = Time.realtimeSinceStartup;
@@ -1272,8 +1273,8 @@ public class RewardArena : MonoBehaviour
             activeMC = true;
             if (activeMC)
                 {
-                Debug.Log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22}",
+
+                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25}",
                     trialNum,
                     Time.realtimeSinceStartup - programT0,
                     (int)currPhase,
@@ -1281,6 +1282,7 @@ public class RewardArena : MonoBehaviour
                     player.transform.position.ToString("F5").Trim(toTrim).Replace(" ", ""),
                     player.transform.eulerAngles.ToString("F5").Trim(toTrim).Replace(" ", ""),
                     zVel,
+                    xVel,
                     yawVel,
                     firefly.transform.position.ToString("F5").Trim(toTrim).Replace(" ", ""),
                     velocity,
@@ -1288,19 +1290,23 @@ public class RewardArena : MonoBehaviour
                     score,
                     rewardTime,
                     timedout,
-                    accelController.IsConnected ? accelController.reading : "NaN,NaN,NaN,NaN,NaN,NaN",
                     syncController.IsConnected ? syncController.TTL : float.NaN,
+                    head_dir,
+                    accelController.IsConnected ? accelController.reading : "NaN,NaN,NaN,NaN,NaN,NaN",
+                    distalObject.activeInHierarchy ? 1 : 0,
+                    distalRotation,
+
                     motionCueingController.motionCueing.frame.surge,
                     motionCueingController.motionCueing.frame.lateral,
                     motionCueingController.motionCueing.frame.heave,
                     motionCueingController.motionCueing.frame.roll,
                     motionCueingController.motionCueing.frame.pitch,
-                    motionCueingController.motionCueing.frame.yaw,
-                    distalObject.activeInHierarchy ? 1 : 0,
-                    distalRotation) + "\n");
+                    motionCueingController.motionCueing.frame.yaw
+                    ) + "\n");
                 //string.Join(",", labJackController.ValueAIN)) + "\n");
-                Debug.Log("bbbbbbbbbbbbbbbbbbbbbb");
-                } else
+
+
+            } else
                 {
                     sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19}",
                     trialNum,

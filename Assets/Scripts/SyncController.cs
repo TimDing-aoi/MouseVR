@@ -64,6 +64,7 @@ public class SyncController : MonoBehaviour
         }
         catch (Exception e)
         {
+
             updatesCounter++;
             if (updatesCounter % 100 == 0)
                 PlayerPrefs.SetString("TTL State", "Disconnected");
