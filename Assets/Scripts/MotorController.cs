@@ -80,7 +80,7 @@ public class MotorController : MonoBehaviour
         if ((int)PlayerPrefs.GetFloat("Enable MC") == 1)
         {
             yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
-            Debug.Log("using yawVel from MC ----------------------------------------");
+            //Debug.Log("using yawVel from MC ----------------------------------------");
         }
         else
         {

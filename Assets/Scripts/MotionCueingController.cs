@@ -73,21 +73,24 @@ public class MotionCueingController : MonoBehaviour
 
         DontDestroyOnLoad(this);
 
-   
 
-//#if ACTIVE
-//#if TEST
-//        TestMotionCueing();
-//#else
-//        ActivateMotionCueing();
-//#endif
-//#endif
+
+        //#if ACTIVE
+        //#if TEST
+        //        TestMotionCueing();
+        //#else
+        //        ActivateMotionCueing();
+        //#endif
+        //#endif
+
 
         if (active)
         {
             // ip, commands, errt, arena limit, max speed, max acc, 10, 30, 150, 1, max x vel, max ang vel
             motionCueing = new CMotionCueing("192.168.16.10", 61557, 61559, limit1, limit2, limit3, limit4, limit5, limit6, maxVelX, maxVelY, maxVelAng);
             motionCueingController = this;
+
+
             if (test)
             {
                 TestMotionCueing();
@@ -96,6 +99,8 @@ public class MotionCueingController : MonoBehaviour
             {
                 ActivateMotionCueing();
             }
+
+
         }
     }
 

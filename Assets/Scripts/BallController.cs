@@ -232,7 +232,9 @@ public class BallController : MonoBehaviour
             else if (keyboard)
             {
                 pitch = Input.GetAxis("Vertical");
-                zVel = pitch / Time.deltaTime/20/5/5;
+
+                //     1 / 0.2 second / 100 = 50 cm/s
+                zVel = pitch / Time.deltaTime/100/2f;
 
 
 
