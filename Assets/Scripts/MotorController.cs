@@ -10,7 +10,7 @@ using static MotionCueingController;
 [DisallowMultipleComponent]
 public class MotorController : MonoBehaviour
 {
-    //wrmhl motor = new wrmhl();
+    wrmhl motor = new wrmhl();
     public static MotorController motorController;
 
     //public SerialController serialController;
@@ -22,12 +22,14 @@ public class MotorController : MonoBehaviour
     public float yawVel = 0.0f;
     public float yawVelMax;
 
-    //public SerialPort _serialPort;
-    //public int ReadTimeout = 5000;
-    //public int QueueLength = 1;
-    //public string portName = "COM10";
-    //public int baudRate = 2000000;
-    //public List<Dictionary<string, object>> data;
+    public SerialPort _serialPort;
+    public int ReadTimeout = 5000;
+    public int QueueLength = 1;
+    public string portName = "COM999";
+    public int baudRate = 2000000;
+    public List<Dictionary<string, object>> data;
+
+
     float roll = 0.0f;
     float yaw = 0.0f;
     int idx = 0;
@@ -47,9 +49,11 @@ public class MotorController : MonoBehaviour
 
 
         //serialController = GameObject.Find("SerialController").GetComponent<SerialController>();
-        //_serialPort = new SerialPort();
-        //motor.set(portName, baudRate, ReadTimeout, QueueLength);
-        //motor.connect();
+        _serialPort = new SerialPort();
+        motor.set(portName, baudRate, ReadTimeout, QueueLength);
+        motor.connect();
+
+        Debug.Log("motor connected-----------------------------------------------------");
 
 
         //// Change com port
@@ -62,15 +66,15 @@ public class MotorController : MonoBehaviour
         //_serialPort.ReadTimeout = 2;
         //_serialPort.WriteTimeout = 2;
 
-        //try
-        //{
-        //    _serialPort.Open();
-        //}
-        //catch (Exception e)
-        //{
-        //    Debug.LogError(e);
-        //    IsConnected = false;
-        //}
+        try
+        {
+            _serialPort.Open();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+            IsConnected = false;
+        }
 
     }
 
@@ -79,15 +83,18 @@ public class MotorController : MonoBehaviour
     {
         if ((int)PlayerPrefs.GetFloat("Enable MC") == 1)
         {
-            yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
+            //yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
             //Debug.Log("using yawVel from MC ----------------------------------------");
+            yawVel = Ball.yawVel;
         }
         else
         {
             yawVel = Ball.yawVel;
         }
+
+
         // 1.9 = 0 V
-        
+
         //print(yawVel);
         //yawVel = deltaYaw / Time.deltaTime;
         yawVel /= yawVelMax;

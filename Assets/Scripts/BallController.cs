@@ -77,14 +77,16 @@ public class BallController : MonoBehaviour
         ball.set(portName, baudRate, ReadTimeout, QueueLength);
 
         //if MC not active, connect directly. if MC active, connect after 15 seconds
-        if (!keyboard && PlayerPrefs.GetInt("Enable MC") != 1)
+        if ((int)PlayerPrefs.GetFloat("Enable MC") == 1)
         {
+            StartCoroutine(WaitCoroutine());
             ball.connect();
         } 
         else
         {
-            StartCoroutine(WaitCoroutine());
+            Debug.Log("Ball without waiting connect at : " + Time.time);
             ball.connect();
+
         }
 
         
@@ -258,13 +260,14 @@ public class BallController : MonoBehaviour
                 zVel = pitch / Time.deltaTime/100/2f;
 
 
-
+                
                 roll = Input.GetAxis("Horizontal");
                 xVel = roll / Time.deltaTime/20/5;
 
 
                 // 1 = 50 deg/s
-                yawVel = roll / Time.deltaTime;
+                // roll / Time.deltaTime = 1/0.2 = 50 deg/s
+                yawVel = roll / Time.deltaTime * 1.5f;
 
             }
             else

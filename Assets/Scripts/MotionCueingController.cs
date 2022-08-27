@@ -430,8 +430,20 @@ public class MotionCueingController : MonoBehaviour
         motionCueing.Dispose();
     }
 
+
+    IEnumerator WaitCoroutine()
+    {
+
+        Debug.Log("MC waiting to connect at : " + Time.time);
+        yield return new WaitForSeconds(15);
+        Debug.Log("MC connecting at : " + Time.time);
+    }
+
     async void ActivateMotionCueing()
     {
+        // safety measure
+        // StartCoroutine(WaitCoroutine());
+
         //Task<int> currentTask;
         //Task<int> mcTask;
 #if USING_100HZ
