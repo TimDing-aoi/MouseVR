@@ -81,6 +81,7 @@ public class BallController : MonoBehaviour
         {
             StartCoroutine(WaitCoroutine());
             ball.connect();
+
         } 
         else
         {
@@ -88,8 +89,6 @@ public class BallController : MonoBehaviour
             ball.connect();
 
         }
-
-        
 
 
 

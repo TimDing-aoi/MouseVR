@@ -794,6 +794,8 @@ public class RewardArena : MonoBehaviour
         //Read();
 
         //HexaTest();
+
+
     }
 
     private void OnApplicationQuit()
@@ -1054,6 +1056,7 @@ public class RewardArena : MonoBehaviour
                 xVel = (float)motionCueingController.motionCueing.filtered[1][2];
                 yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
 
+
                 if (zVel > velMax)
                 {
                     zVel = velMax;
@@ -1214,8 +1217,8 @@ public class RewardArena : MonoBehaviour
             //}
 
 
-            Debug.Log("zVel is : " + zVel);
-            Debug.Log("velMax is : " + velMax);
+           // Debug.Log("zVel is : " + zVel);
+            //Debug.Log("velMax is : " + velMax);
 
             //print(string.Format("{0}, {1}", zVel, xVel));
 
@@ -1529,7 +1532,7 @@ public class RewardArena : MonoBehaviour
 
     async void Startup()
     {
-        await new WaitForSeconds(60.0f);
+        await new WaitForSeconds(15.0f);
 
         currPhase = Phases.begin;
         phase = Phases.begin;
@@ -1851,12 +1854,12 @@ public class RewardArena : MonoBehaviour
            
                 if (distToFF <= fireflyZoneRadius)
                 {
+
                     proximity = true;
                 }
             }
             else
             {
-                
                 proximity = true;
             }
 
@@ -1961,8 +1964,12 @@ public class RewardArena : MonoBehaviour
 
         isCheck = true;
 
+        Debug.Log("isReward: " + isReward);
+        Debug.Log("proximity: " + proximity);
+
         if (isReward && proximity)
         {
+
             audioSource.clip = winSound;
             juiceController.GiveJuice(juiceTime);
             goodTrials++;
