@@ -59,13 +59,7 @@ public class BallController : MonoBehaviour
     float Xscale;
     float Yawscale;
 
-    IEnumerator WaitCoroutine()
-    {
 
-        Debug.Log("Ball waiting to connect at : " + Time.time);
-        yield return new WaitForSeconds(15);
-        Debug.Log("Ball connecting at : " + Time.time);
-    }
 
     void Start()
     {
@@ -77,20 +71,10 @@ public class BallController : MonoBehaviour
         ball.set(portName, baudRate, ReadTimeout, QueueLength);
 
         //if MC not active, connect directly. if MC active, connect after 15 seconds
-        if ((int)PlayerPrefs.GetFloat("Enable MC") == 1)
+        if (!keyboard)
         {
-            StartCoroutine(WaitCoroutine());
             ball.connect();
-
-        } 
-        else
-        {
-            Debug.Log("Ball without waiting connect at : " + Time.time);
-            ball.connect();
-
         }
-
-
 
 
         initTime = Time.time;
@@ -273,7 +257,7 @@ public class BallController : MonoBehaviour
             {
                 float t = Time.time;
                 // if mc strat 60s after start
-                if (t - initTime > 0.4f)
+                if (t - initTime > 20)
                 {
                     string ball_input = ball.readQueue();
                     string[] line = ball_input.Split(',');

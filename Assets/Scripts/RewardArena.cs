@@ -1052,21 +1052,12 @@ public class RewardArena : MonoBehaviour
             if (activeMC)
             {
 
-                zVel = (float)motionCueingController.motionCueing.filtered[0][2];
+                zVel = (float)motionCueingController.curSpeed;
                 xVel = (float)motionCueingController.motionCueing.filtered[1][2];
                 yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
 
 
-                if (zVel > velMax)
-                {
-                    zVel = velMax;
-                    Debug.Log("zVel upperbound-------------");
-                }
-                else if (zVel < velMin)
-                {
-                    zVel = velMin;
-                    Debug.Log("zVel lowerbound-------------");
-                }
+        
 
             }
             else
@@ -1075,17 +1066,6 @@ public class RewardArena : MonoBehaviour
                 zVel = Ball.zVel*gain;
                 yawVel = Ball.yawVel*gain;
                 xVel = Ball.xVel*gain;
-
-                if (zVel > velMax)
-                {
-                    zVel = velMax;
-                    Debug.Log("zVel upperbound-------------");
-                }
-                else if (zVel < velMin)
-                {
-                    zVel = velMin;
-                    Debug.Log("zVel lowerbound-------------");
-                }
 
                 //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
 

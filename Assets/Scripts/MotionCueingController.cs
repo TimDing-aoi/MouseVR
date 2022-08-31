@@ -50,6 +50,10 @@ public class MotionCueingController : MonoBehaviour
     public double speed = 0;
     public double angSpeed = 0;
 
+    public double curSpeed = 0;
+    public double prevSpeed = 0;
+    public double decayRate = 0.005;
+
     public Task<int> currentTask;
 
     Keyboard keyboard;
@@ -181,10 +185,33 @@ public class MotionCueingController : MonoBehaviour
         if (active)
         {
             // calibrated values
-       
+
 
             speed = Ball.zVel;
             angSpeed = Ball.yawVel;
+
+
+            if (speed > 0.2f)
+            {
+                speed = 0.2f;
+                //Debug.Log("zVel upperbound-------------");
+            }
+            else if (speed < -0.2f)
+            {
+                speed = -0.2f;
+                //Debug.Log("zVel lowerbound-------------");
+            }
+
+            prevSpeed = curSpeed;
+            curSpeed = speed;
+
+            if (curSpeed < prevSpeed && curSpeed - decayRate > 0)
+            {
+                speed -= decayRate;
+            }
+
+
+
             // ask Jean whether we can use roll in MC
             IsStop = SharedReward.IsStop;
 
@@ -442,7 +469,7 @@ public class MotionCueingController : MonoBehaviour
     async void ActivateMotionCueing()
     {
         // safety measure
-        // StartCoroutine(WaitCoroutine());
+        StartCoroutine(WaitCoroutine());
 
         //Task<int> currentTask;
         //Task<int> mcTask;
@@ -510,6 +537,7 @@ public class CMotionCueing : IDisposable
             public double vrX;
             public double vrY;
             public double vrYaw;
+
         };
 
         public struct Frame
