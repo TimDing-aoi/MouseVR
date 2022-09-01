@@ -1056,8 +1056,19 @@ public class RewardArena : MonoBehaviour
                 xVel = (float)motionCueingController.motionCueing.filtered[1][2];
                 yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
 
+                var vr_arena_limit = 0.21f;
 
-        
+                if (Mathf.Abs(player.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(player.transform.position.z) > Mathf.Abs(vr_arena_limit))
+                {
+                    Debug.Log("checkpoint 222222222222222-------------");
+                    xVel = 0;
+                    zVel = 0;
+
+                    //player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+                    //Debug.Log("player velocity-------------" + );
+                }
+
 
             }
             else
@@ -1066,6 +1077,21 @@ public class RewardArena : MonoBehaviour
                 zVel = Ball.zVel*gain;
                 yawVel = Ball.yawVel*gain;
                 xVel = Ball.xVel*gain;
+
+                var vr_arena_limit = 0.21f;
+
+                //player.transform.position += new Vector3(xVel * Time.deltaTime, 0.0f, zVel * Time.deltaTime);
+
+                if ( Mathf.Abs(player.transform.position.x) + Time.deltaTime * xVel > Mathf.Abs(vr_arena_limit) )
+                {
+                    xVel = 0;
+                    Debug.Log("x zero-------------" + xVel);
+
+                } else if (Mathf.Abs(player.transform.position.z) + Time.deltaTime * zVel > Mathf.Abs(vr_arena_limit) )
+                {
+                    zVel = 0;
+                    Debug.Log("z zero-------------" + zVel);
+                }
 
                 //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
 
@@ -1158,35 +1184,43 @@ public class RewardArena : MonoBehaviour
             //    yawVel = rotMin;
             //}
 
-            if (areWalls == 1f)
-            {
-                var vr_arena_limit = 0.21f;
+            //if (areWalls == 1f)
+            //{
+            //    var vr_arena_limit = 0.21f;
 
-                //Debug.Log("checkpoint 111111111111111-------------");
+            //    //Debug.Log("checkpoint 111111111111111-------------");
 
-                if (Mathf.Abs(player.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(player.transform.position.z) > Mathf.Abs(vr_arena_limit))
-                {
-                    //Debug.Log("checkpoint 222222222222222-------------");
-                    xVel = 0;
-                    zVel = 0;
-                }
-                if (player.transform.position.x < -vr_arena_limit)
-                {
-                    player.transform.position = new Vector3(-vr_arena_limit, p_height, player.transform.position.z);
-                }
-                if (player.transform.position.x > vr_arena_limit)
-                {
-                    player.transform.position = new Vector3(vr_arena_limit, p_height, player.transform.position.z);
-                }
-                if (player.transform.position.z < -vr_arena_limit)
-                {
-                    player.transform.position = new Vector3(player.transform.position.x, p_height, -vr_arena_limit);
-                }
-                if (player.transform.position.z > vr_arena_limit)
-                {
-                    player.transform.position = new Vector3(player.transform.position.x, p_height, vr_arena_limit);
-                }
-            }
+            //    if (Mathf.Abs(player.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(player.transform.position.z) > Mathf.Abs(vr_arena_limit))
+            //    {
+            //        Debug.Log("checkpoint 222222222222222-------------");
+            //        //xVel = 0;
+            //        //zVel = 0;
+
+            //        //player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+            //        //Debug.Log("player velocity-------------" + );
+            //    }
+
+
+            //    if (player.transform.position.x < -vr_arena_limit)
+            //    {
+            //        player.transform.position = new Vector3(-vr_arena_limit, p_height, player.transform.position.z);
+            //    }
+            //    if (player.transform.position.x > vr_arena_limit)
+            //    {
+            //        player.transform.position = new Vector3(vr_arena_limit, p_height, player.transform.position.z);
+            //    }
+            //    if (player.transform.position.z < -vr_arena_limit)
+            //    {
+            //        player.transform.position = new Vector3(player.transform.position.x, p_height, -vr_arena_limit);
+            //    }
+            //    if (player.transform.position.z > vr_arena_limit)
+            //    {
+            //        player.transform.position = new Vector3(player.transform.position.x, p_height, vr_arena_limit);
+            //    }
+
+
+            //}
 
             // if angle is defined, we are in training stage
             //if (areWalls == 1f)
@@ -1196,11 +1230,6 @@ public class RewardArena : MonoBehaviour
 
             //}
 
-
-           // Debug.Log("zVel is : " + zVel);
-            //Debug.Log("velMax is : " + velMax);
-
-            //print(string.Format("{0}, {1}", zVel, xVel));
 
             switch ((int)yaw_flag)
             {

@@ -51,10 +51,11 @@ public class MotionCueingController : MonoBehaviour
     public double mcSpeed = 0;
     public double angSpeed = 0;
 
+
     public double curSpeed = 0;
     public double prevSpeed = 0;
     public double decayRate = 0.00005;
-    public double speedAdj = 0;
+    public double locMaxSpeed = 0;
 
     public int numOfFrames = 0;
 
@@ -205,59 +206,84 @@ public class MotionCueingController : MonoBehaviour
             if (ballSpeed > 0.2f)
             {
                 ballSpeed = 0.2f;
-                //Debug.Log("zVel upperbound-------------");
             }
             else if (ballSpeed < 0)
             {
                 ballSpeed = 0;
-                //Debug.Log("zVel lowerbound-------------");
             }
 
             prevSpeed = curSpeed;
             curSpeed = ballSpeed;
 
-            mcSpeed = ballSpeed;
+            
 
-            //if (curSpeed < prevSpeed && mcSpeed - curSpeed < 0.10666f)
+
+
+            if (curSpeed < prevSpeed || ( mcSpeed - curSpeed < 0.05f && mcSpeed - curSpeed > 0 ) )
+            {
+
+                //mcSpeed = ballSpeed;
+                //mcSpeed += (prevSpeed - curSpeed) / 2;
+
+                numOfFrames++;
+                mcSpeed = locMaxSpeed - numOfFrames * 0.0076;
+
+                Debug.Log("MC speed is :           " + mcSpeed);
+                Debug.Log("current speed is :      " + curSpeed);
+
+                //if ((mcSpeed - curSpeed < 0.11f) && (mcSpeed - curSpeed > 0))
+                //{
+                //    Debug.Log("statement is true");
+                //}
+                //else
+                //{
+                //    Debug.Log("statement is false");
+                //}
+            }
+            else
+            {
+                locMaxSpeed = ballSpeed;
+                numOfFrames = 0;
+                mcSpeed = ballSpeed;
+            }
+
+
+            //if (curSpeed < prevSpeed && curSpeed > 0)
             //{
-            //    mcSpeed += (prevSpeed - curSpeed) / 2;
+            //    Debug.Log(curSpeed);
+            //    Debug.Log(prevSpeed);
+            //    Debug.Log("adjesting1111111111111111111-------------" + numOfFrames);
+            //    speedIsDecaying = true;
+            //    numOfFrames += 1;
+            //    mcSpeed = ballSpeed + numOfFrames * 0.0076f;
+            //    Debug.Log(mcSpeed);
+            //    //mcSpeed += (mcSpeed - curSpeed) / 2;
+            //} else
+            //{
+            //    Debug.Log("adjesting2222222222222222222-------------" + numOfFrames);
+            //    numOfFrames = 0;
+            //    mcSpeed -= 0.0076f;
+            //    Debug.Log(mcSpeed);
             //}
 
 
-            if (curSpeed < prevSpeed && curSpeed > 0)
-            {
-                Debug.Log(curSpeed);
-                Debug.Log(prevSpeed);
-                Debug.Log("adjesting1111111111111111111-------------" + numOfFrames);
-                speedIsDecaying = true;
-                numOfFrames += 1;
-                mcSpeed = ballSpeed + numOfFrames * 0.0076f;
-                Debug.Log(mcSpeed);
-                //mcSpeed += (mcSpeed - curSpeed) / 2;
-            } else
-            {
-                Debug.Log("adjesting2222222222222222222-------------" + numOfFrames);
-                numOfFrames = 0;
-                mcSpeed -= 0.0076f;
-                Debug.Log(mcSpeed);
-            }
-                //else if (curSpeed == 0 && curSpeed == prevSpeed && mcSpeed > 0)
-                //{
-                //    speedIsDecaying = false;
-                //    numOfFrames = 0;
-                //    mcSpeed -= 0.0076f;
+            //else if (curSpeed == 0 && curSpeed == prevSpeed && mcSpeed > 0)
+            //{
+            //    speedIsDecaying = false;
+            //    numOfFrames = 0;
+            //    mcSpeed -= 0.0076f;
 
-                //}
+            //}
 
-                //else if (curSpeed > prevSpeed && mcSpeed > curSpeed)
-                //{
+            //else if (curSpeed > prevSpeed && mcSpeed > curSpeed)
+            //{
 
-                //}
+            //}
 
 
 
-                // ask Jean whether we can use roll in MC
-                IsStop = SharedReward.IsStop;
+            // ask Jean whether we can use roll in MC
+            IsStop = SharedReward.IsStop;
 
         }
     }
