@@ -811,7 +811,7 @@ public class RewardArena : MonoBehaviour
         //File.WriteAllText("C:\\Users\\jc10487\\Documents\\timingTest.txt", stringBuilder.ToString());
     }
 
-    private void makeWallsInvisible()
+    private void MakeWallsInvisible()
     {
         if (areWalls == 1)
         {
@@ -834,7 +834,7 @@ public class RewardArena : MonoBehaviour
 
     }
 
-    private void makeWallsVisible()
+    private void MakeWallsVisible()
     {
         if (areWalls == 1)
         {
@@ -857,6 +857,33 @@ public class RewardArena : MonoBehaviour
 
     }
 
+    private void UpdatePlayerPosition(GameObject currentPlayer, float zVel, float xVel, float yawVel)
+    {
+        switch ((int)yaw_flag)
+        {
+
+            case 0:
+                // head free to rotate
+                //player.transform.position += new Vector3(0.0f, 0.0f, deltaZ);
+                currentPlayer.transform.position += new Vector3(xVel * Time.deltaTime, 0.0f, zVel * Time.deltaTime);
+                break;
+
+            case 1:
+                // head fixed, rotate the ball
+                currentPlayer.transform.position += currentPlayer.transform.forward * zVel * Time.deltaTime;
+                currentPlayer.transform.Rotate(0.0f, yawVel * Time.deltaTime, 0.0f);
+                break;
+
+            default:
+                currentPlayer.transform.position += currentPlayer.transform.forward * zVel * Time.deltaTime;
+                currentPlayer.transform.Rotate(0.0f, yawVel * Time.deltaTime, 0.0f);
+                //var dx = deltaZ - deltaX;
+                //var dy = deltaZ + deltaX;
+                //player.transform.position += player.transform.forward * Mathf.Sqrt(Mathf.Pow(dx, 2.0f) + Mathf.Pow(dy, 2.0f));
+
+                break;
+        }
+    }
 
     /// <summary>
     /// Update is called once per frame
@@ -901,19 +928,20 @@ public class RewardArena : MonoBehaviour
         if ((Time.realtimeSinceStartup - programT0) % (2 * distalOnDur) > distalOnDur && distalOnDur != 0 || !distalOn)
         {
             distalObject.SetActive(false);
-            makeWallsInvisible();
+            MakeWallsInvisible();
 
         }
         else
         {
             distalObject.SetActive(true);
-            makeWallsVisible();
+            MakeWallsVisible();
 
         }
 
         Vector2 FF2D = new Vector2(firefly.transform.position.x, firefly.transform.position.z);
         Vector2 PP2D = new Vector2(player.transform.position.x, player.transform.position.z);
         distToFF = Vector2.Distance(FF2D, PP2D);
+
         //if (isReplay & replayIdx < replayMaxIdx)
         //{
         //    print(string.Format("x {0}, yaw {1}, z {2}", replayX[replayIdx], replayYaw[replayIdx], replayZ[replayIdx]));
@@ -1055,19 +1083,6 @@ public class RewardArena : MonoBehaviour
                 xVel = (float)motionCueingController.motionCueing.filtered[1][2];
                 yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
 
-                //var vr_arena_limit = 0.21f;
-
-                //if (Mathf.Abs(player.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(player.transform.position.z) > Mathf.Abs(vr_arena_limit))
-                //{
-                //    Debug.Log("checkpoint 222222222222222-------------");
-                //    xVel = 0;
-                //    zVel = 0;
-
-                //    //player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-
-                //    //Debug.Log("player velocity-------------" + );
-                //}
-
 
             }
             else
@@ -1077,20 +1092,21 @@ public class RewardArena : MonoBehaviour
                 yawVel = Ball.yawVel*gain;
                 xVel = Ball.xVel*gain;
 
-                //var vr_arena_limit = 0.21f;
+                
 
-                ////player.transform.position += new Vector3(xVel * Time.deltaTime, 0.0f, zVel * Time.deltaTime);
+                var vr_arena_limit = 0.21f;
+                var futurePlayer = player;
 
-                //if ( Mathf.Abs(player.transform.position.x) + Time.deltaTime * xVel > Mathf.Abs(vr_arena_limit) )
-                //{
-                //    xVel = 0;
-                //    //Debug.Log("x zero-------------" + xVel);
+                UpdatePlayerPosition(futurePlayer, zVel, xVel, yawVel);
 
-                //} else if (Mathf.Abs(player.transform.position.z) + Time.deltaTime * zVel > Mathf.Abs(vr_arena_limit) )
-                //{
-                //    zVel = 0;
-                //    //Debug.Log("z zero-------------" + zVel);
-                //}
+                if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit))
+                {
+                    zVel = 0;
+                    player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    Debug.Log("z zero-------------" + xVel);
+
+                }
+
 
                 //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
 
@@ -1221,39 +1237,43 @@ public class RewardArena : MonoBehaviour
 
             //}
 
-                // if angle is defined, we are in training stage
-                //if (areWalls == 1f)
-                //{
-                //    var vr_arena_limit = 0.22f;
+            // if angle is defined, we are in training stage
+            //if (areWalls == 1f)
+            //{
+            //    var vr_arena_limit = 0.22f;
 
 
-                //}
+            //}
 
 
-                switch ((int)yaw_flag)
-            {
+
+
+            UpdatePlayerPosition(player, zVel, xVel, yawVel);
+
+            //switch ((int)yaw_flag)
+            //{
   
-                case 0:
-                    // head free to rotate
-                    //player.transform.position += new Vector3(0.0f, 0.0f, deltaZ);
-                    player.transform.position += new Vector3(xVel * Time.deltaTime, 0.0f, zVel * Time.deltaTime);
-                    break;
+            //    case 0:
+            //        // head free to rotate
+            //        //player.transform.position += new Vector3(0.0f, 0.0f, deltaZ);
+            //        player.transform.position += new Vector3(xVel * Time.deltaTime, 0.0f, zVel * Time.deltaTime);
+            //        break;
 
-                case 1:
-                    // head fixed, rotate the ball
-                    player.transform.position += player.transform.forward * zVel * Time.deltaTime;
-                    player.transform.Rotate(0.0f, yawVel * Time.deltaTime, 0.0f);
-                    break;
+            //    case 1:
+            //        // head fixed, rotate the ball
+            //        player.transform.position += player.transform.forward * zVel * Time.deltaTime;
+            //        player.transform.Rotate(0.0f, yawVel * Time.deltaTime, 0.0f);
+            //        break;
 
-                default:
-                    player.transform.position += player.transform.forward * zVel * Time.deltaTime;
-                    player.transform.Rotate(0.0f, yawVel * Time.deltaTime, 0.0f);
-                    //var dx = deltaZ - deltaX;
-                    //var dy = deltaZ + deltaX;
-                    //player.transform.position += player.transform.forward * Mathf.Sqrt(Mathf.Pow(dx, 2.0f) + Mathf.Pow(dy, 2.0f));
+            //    default:
+            //        player.transform.position += player.transform.forward * zVel * Time.deltaTime;
+            //        player.transform.Rotate(0.0f, yawVel * Time.deltaTime, 0.0f);
+            //        //var dx = deltaZ - deltaX;
+            //        //var dy = deltaZ + deltaX;
+            //        //player.transform.position += player.transform.forward * Mathf.Sqrt(Mathf.Pow(dx, 2.0f) + Mathf.Pow(dy, 2.0f));
 
-                    break;
-            }
+            //        break;
+            //}
 
 
 
@@ -1474,7 +1494,7 @@ public class RewardArena : MonoBehaviour
         if (isVisionOff != 0)
         {
             distalObject.SetActive(false);
-            makeWallsInvisible();
+            MakeWallsInvisible();
             firefly.SetActive(false);
             var emission = particleSystem.emission;
             emission.enabled = false;
