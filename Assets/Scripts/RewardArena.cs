@@ -760,16 +760,15 @@ public class RewardArena : MonoBehaviour
         //contPath = "C:\\Users\\lab\\Desktop\\TrainData" + "/cd_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
         //configPath = "C:\\Users\\lab\\Desktop\\TrainData" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
 
-        contPath = "C:\\Users\\lab\\Desktop\\2022_08_04" + "/cd_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
-        configPath = "C:\\Users\\lab\\Desktop\\2022_08_04" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
+        contPath = "C:\\Users\\lab\\Desktop\\RecData" + "/cd_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".csv";
+        configPath = "C:\\Users\\lab\\Desktop\\RecData" + "/metafile_" + mouseID + "_" + System.DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".xml";
 
 
         //print(contPath);
         // string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ, zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,TTL,Tx,Ty,Tz,Rx,Ry,Rz,head_dir";
-        string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,DistalOnOff,DistalRotation,surge,lateral,heave,roll,pitch,yaw";
+        string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,DistalOnOff,DistalRotation,balldZ,balldX,balldYaw,surge,lateral,heave,roll,pitch,yaw,AccX,AccY,AccZ,GyroX,GyroY,GyroZ";
 
-        //string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,DistalOnOff,DistalRotation";
-        // firstLine = "n,max_v,max_w,ffv,onDuration,PosX0,PosY0,PosZ0,RotX0,RotY0,RotZ0,RotW0,ffX,ffY,ffZ,pCheckX,pCheckY,pCheckZ,rCheckX,rCheckY,rCheckZ,rCheckW,distToFF,rewarded,timeout,beginTime,checkTime,rewardTime,duration,delays,ITI";
+        
 
         File.AppendAllText(contPath, firstLine + "\n");
 
@@ -1056,18 +1055,18 @@ public class RewardArena : MonoBehaviour
                 xVel = (float)motionCueingController.motionCueing.filtered[1][2];
                 yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
 
-                var vr_arena_limit = 0.21f;
+                //var vr_arena_limit = 0.21f;
 
-                if (Mathf.Abs(player.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(player.transform.position.z) > Mathf.Abs(vr_arena_limit))
-                {
-                    Debug.Log("checkpoint 222222222222222-------------");
-                    xVel = 0;
-                    zVel = 0;
+                //if (Mathf.Abs(player.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(player.transform.position.z) > Mathf.Abs(vr_arena_limit))
+                //{
+                //    Debug.Log("checkpoint 222222222222222-------------");
+                //    xVel = 0;
+                //    zVel = 0;
 
-                    //player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                //    //player.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
-                    //Debug.Log("player velocity-------------" + );
-                }
+                //    //Debug.Log("player velocity-------------" + );
+                //}
 
 
             }
@@ -1078,20 +1077,20 @@ public class RewardArena : MonoBehaviour
                 yawVel = Ball.yawVel*gain;
                 xVel = Ball.xVel*gain;
 
-                var vr_arena_limit = 0.21f;
+                //var vr_arena_limit = 0.21f;
 
-                //player.transform.position += new Vector3(xVel * Time.deltaTime, 0.0f, zVel * Time.deltaTime);
+                ////player.transform.position += new Vector3(xVel * Time.deltaTime, 0.0f, zVel * Time.deltaTime);
 
-                if ( Mathf.Abs(player.transform.position.x) + Time.deltaTime * xVel > Mathf.Abs(vr_arena_limit) )
-                {
-                    xVel = 0;
-                    Debug.Log("x zero-------------" + xVel);
+                //if ( Mathf.Abs(player.transform.position.x) + Time.deltaTime * xVel > Mathf.Abs(vr_arena_limit) )
+                //{
+                //    xVel = 0;
+                //    //Debug.Log("x zero-------------" + xVel);
 
-                } else if (Mathf.Abs(player.transform.position.z) + Time.deltaTime * zVel > Mathf.Abs(vr_arena_limit) )
-                {
-                    zVel = 0;
-                    Debug.Log("z zero-------------" + zVel);
-                }
+                //} else if (Mathf.Abs(player.transform.position.z) + Time.deltaTime * zVel > Mathf.Abs(vr_arena_limit) )
+                //{
+                //    zVel = 0;
+                //    //Debug.Log("z zero-------------" + zVel);
+                //}
 
                 //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
 
@@ -1222,16 +1221,16 @@ public class RewardArena : MonoBehaviour
 
             //}
 
-            // if angle is defined, we are in training stage
-            //if (areWalls == 1f)
-            //{
-            //    var vr_arena_limit = 0.22f;
+                // if angle is defined, we are in training stage
+                //if (areWalls == 1f)
+                //{
+                //    var vr_arena_limit = 0.22f;
 
 
-            //}
+                //}
 
 
-            switch ((int)yaw_flag)
+                switch ((int)yaw_flag)
             {
   
                 case 0:
@@ -1320,7 +1319,7 @@ public class RewardArena : MonoBehaviour
             if (activeMC)
                 {
 
-                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25}",
+                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28}",
                     trialNum,
                     Time.realtimeSinceStartup - programT0,
                     (int)currPhase,
@@ -1338,23 +1337,25 @@ public class RewardArena : MonoBehaviour
                     timedout,
                     syncController.IsConnected ? syncController.TTL : float.NaN,
                     head_dir,
-                    accelController.IsConnected ? accelController.reading : "NaN,NaN,NaN,NaN,NaN,NaN",
                     distalObject.activeInHierarchy ? 1 : 0,
                     distalRotation,
-
+                    Ball.ballDeltaZ,
+                    Ball.ballDeltaX,
+                    Ball.ballDeltaYaw,
                     motionCueingController.motionCueing.frame.surge,
                     motionCueingController.motionCueing.frame.lateral,
                     motionCueingController.motionCueing.frame.heave,
                     motionCueingController.motionCueing.frame.roll,
                     motionCueingController.motionCueing.frame.pitch,
-                    motionCueingController.motionCueing.frame.yaw
+                    motionCueingController.motionCueing.frame.yaw,
+                    accelController.IsConnected ? accelController.reading : "0,0,0,0,0,0"
                     ) + "\n");
                 //string.Join(",", labJackController.ValueAIN)) + "\n");
 
 
             } else
                 {
-                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19}",
+                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22}",
                     trialNum,
                     Time.realtimeSinceStartup - programT0,
                     (int)currPhase,
@@ -1372,9 +1373,12 @@ public class RewardArena : MonoBehaviour
                     timedout,
                     sync_ttl,
                     head_dir,
-                    accelController.IsConnected ? accelController.reading : "NaN,NaN,NaN,NaN,NaN,NaN",
                     distalObject.activeInHierarchy ? 1 : 0,
-                    distalRotation
+                    distalRotation,
+                    Ball.ballDeltaZ,
+                    Ball.ballDeltaX,
+                    Ball.ballDeltaYaw,
+                    accelController.IsConnected ? accelController.reading : "0,0,0,0,0,0"
                     ) + "\n");
                     //string.Join(",", labJackController.ValueAIN)) + "\n");
                 }
@@ -1973,8 +1977,8 @@ public class RewardArena : MonoBehaviour
 
         isCheck = true;
 
-        Debug.Log("isReward: " + isReward);
-        Debug.Log("proximity: " + proximity);
+        //Debug.Log("isReward: " + isReward);
+        //Debug.Log("proximity: " + proximity);
 
         if (isReward && proximity)
         {

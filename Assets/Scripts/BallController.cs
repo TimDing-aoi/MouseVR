@@ -23,6 +23,12 @@ public class BallController : MonoBehaviour
     [HideInInspector] public float deltaZ;
     [HideInInspector] public float deltaYaw;
 
+    [HideInInspector] public float ballDeltaX;
+    [HideInInspector] public float ballDeltaZ;
+    [HideInInspector] public float ballDeltaYaw;
+
+    private float kb_vert;
+    private float kb_hor;
     public float xVel;
     public float zVel;
     public float yawVel;
@@ -31,8 +37,9 @@ public class BallController : MonoBehaviour
     [HideInInspector] public float hor;
     private string data;
     private float initTime;
+    private float initDelay;
     public bool IsConnected = true;
-
+    public bool mcActive;
 
     public string portName = "COM11";
     public int baudRate = 2000000;
@@ -76,6 +83,15 @@ public class BallController : MonoBehaviour
             ball.connect();
         }
 
+        mcActive = (int)PlayerPrefs.GetFloat("Enable MC") == 1;
+        if(mcActive)
+        {
+            initDelay = 20;
+        } else
+        {
+            initDelay = 1;
+        }
+        
 
         initTime = Time.time;
 
@@ -114,167 +130,75 @@ public class BallController : MonoBehaviour
     {
         try
         {
+            
 
-            //vert = Input.GetAxis("Vertical"); // ~0.5m/s
-            //if (vert > 0)
-            //{
-            //    vert = 1 / 20000.0f;
-            //}
-            //else if (vert < 0)
-            //{
-            //    vert = -1 / 20000.0f;
-            //}
-
-            //if (vert > 0)
-            //{
-            //    pitch += maxAcc;
-
-            //    if (pitch > maxSpeed)
-            //    {
-            //        pitch = maxSpeed;
-            //    }
-            //}
-            //else if (vert < 0)
-            //{
-            //    pitch -= maxAcc;
-
-            //    if (pitch < -maxSpeed)
-            //    {
-            //        pitch = -maxSpeed;
-            //    }
-            //}
-            //else
-            //{
-            //    if (pitch < 0)
-            //    {
-            //        pitch += maxAcc;
-
-            //        if (pitch > 0)
-            //        {
-            //            pitch = 0;
-            //        }
-            //    }
-            //    else if (pitch > 0)
-            //    {
-            //        pitch -= maxAcc;
-
-            //        if (pitch < 0)
-            //        {
-            //            pitch = 0;
-            //        }
-            //    }
-            //}
-
-
-            //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", zVel, xVel, yawVel));
-
-            //if (hor > 0)
-            //{
-            //    hor = 1 / 20000.0f;
-            //}
-            //else if (hor < 0)
-            //{
-            //    hor = -1 / 20000.0f;
-            //}
-
-            //if (hor > 0)
-            //{
-            //    yaw += maxAcc;
-
-            //    if (yaw > maxSpeed)
-            //    {
-            //        yaw = maxSpeed;
-            //    }
-            //}
-            //else if (hor < 0)
-            //{
-            //    yaw -= maxAcc;
-
-            //    if (yaw < -maxSpeed)
-            //    {
-            //        yaw = -maxSpeed;
-            //    }
-            //}
-            //else
-            //{
-            //    if (yaw < 0)
-            //    {
-            //        yaw += maxAcc;
-
-            //        if (yaw > 0)
-            //        {
-            //            yaw = 0;
-            //        }
-            //    }
-            //    else if (yaw > 0)
-            //    {
-            //        yaw -= maxAcc;
-
-            //        if (yaw < 0)
-            //        {
-            //            yaw = 0;
-            //        }
-            //    }
-            //}
-
-
-            if (isReplay & replayIdx < replayMaxIdx)
+            float t = Time.time;
+            // if mc strat 60s after start
+            if (t - initTime > initDelay)
             {
-                //print(string.Format("x {0}, yaw {1}, z {2}", replayX[replayIdx], replayYaw[replayIdx], replayZ[replayIdx]));
-
-                deltaZ = replayZ[replayIdx];
-                deltaX = replayX[replayIdx];
-                deltaYaw = replayYaw[replayIdx];
-                yawCopy = deltaYaw;
-
-                zVel = deltaZ / Time.deltaTime;
-                xVel = deltaX / Time.deltaTime;
-                yawVel = deltaYaw / Time.deltaTime;
-                //player.transform.position += new Vector3(replayX[replayIdx], p_height, replayZ[replayIdx]);
-                //player.transform.rotation = Quaternion.Euler(0f, replayYaw[replayIdx], 0f);
-                replayIdx++;
-                
-            }
-            else if (keyboard)
-            {
-                pitch = Input.GetAxis("Vertical");
-
-                //     1 / 0.2 second / 100 = 50 cm/s
-                zVel = pitch / Time.deltaTime/100/2f;
 
 
-                
-                roll = Input.GetAxis("Horizontal");
-                xVel = roll / Time.deltaTime/20/5;
+                ////////////////needs to be commented out for keyboard simulation, otherwise will stuck at ball.readQueue()///////////////////////
+
+                //string ball_input = ball.readQueue();
+                //string[] line = ball_input.Split(',');
+                //print(ball_input);
 
 
-                // 1 = 50 deg/s
-                // roll / Time.deltaTime = 1/0.2 = 50 deg/s
-                yawVel = roll / Time.deltaTime * 1.5f;
+                //pitch = float.Parse(line[0]);
+                //roll = float.Parse(line[1]);
+                //yaw = float.Parse(line[2]);
+                //yawCopy = yaw;
 
-            }
-            else
-            {
-                float t = Time.time;
-                // if mc strat 60s after start
-                if (t - initTime > 20)
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                // calibrate once a week
+                ballDeltaZ = pitch * -0.0085384834f * 3f;
+                ballDeltaX = roll * -0.0093862942f * 2.5f;
+                // ball/visual = 1
+                ballDeltaYaw = yaw * -0.1713298528f * 4;
+                // squeze 360 deg into 30
+                //deltaYaw = deltaYaw * 12;
+
+
+                if (isReplay & replayIdx < replayMaxIdx)
                 {
-                    string ball_input = ball.readQueue();
-                    string[] line = ball_input.Split(',');
-                    //print(ball_input);
+                    //print(string.Format("x {0}, yaw {1}, z {2}", replayX[replayIdx], replayYaw[replayIdx], replayZ[replayIdx]));
 
-                    pitch = float.Parse(line[0]);
-                    roll = float.Parse(line[1]);
-                    yaw = float.Parse(line[2]);
-                    yawCopy = yaw;
-                    // calibrate once a week
-                    deltaZ = pitch * -0.0085384834f;
-                    deltaX = roll * -0.0093862942f;
-                    // ball/visual = 1
-                    deltaYaw = yaw * -0.1713298528f*4;
-                    // squeze 360 deg into 30
-                    //deltaYaw = deltaYaw * 12;
-              
+
+                    deltaZ = replayZ[replayIdx];
+                    deltaX = replayX[replayIdx];
+                    deltaYaw = replayYaw[replayIdx];
+                    yawCopy = deltaYaw;
+
+                    zVel = deltaZ / Time.deltaTime;
+                    xVel = deltaX / Time.deltaTime;
+                    yawVel = deltaYaw / Time.deltaTime;
+                    //player.transform.position += new Vector3(replayX[replayIdx], p_height, replayZ[replayIdx]);
+                    //player.transform.rotation = Quaternion.Euler(0f, replayYaw[replayIdx], 0f);
+                    replayIdx++;
+                
+                }
+                else if (keyboard)
+                {
+
+                    kb_vert = Input.GetAxis("Vertical");
+                    //     1 / 0.2 second / 100 = 50 cm/s
+                    zVel = kb_vert / Time.deltaTime/100/2f;
+
+
+                
+                    kb_hor = Input.GetAxis("Horizontal");
+                    xVel = kb_hor / Time.deltaTime/20/5;
+
+
+                    // 1 = 50 deg/s
+                    // roll / Time.deltaTime = 1/0.2 = 50 deg/s
+                    yawVel = kb_hor / Time.deltaTime * 1.5f;
+
+                }
+                else
+                {
 
                     if (motorYaw > 0)
                     {
@@ -282,11 +206,10 @@ public class BallController : MonoBehaviour
                         // yaw rotation is not probably detected, so disable yaw when runing at angle
                         if (Math.Abs(pitch) > 0.05)
                         {
-                            deltaYaw = 0;
+                            ballDeltaYaw = 0;
                         }
-                        yawVel = deltaYaw / Time.deltaTime;
+                        yawVel = ballDeltaYaw / Time.deltaTime;
                     }
-
 
 
 
@@ -294,8 +217,8 @@ public class BallController : MonoBehaviour
                     //deltaX = roll * -1 * Xscale;
                     //deltaYaw = yaw * Yawscale;
 
-                    zVel = deltaZ / Time.deltaTime * 3f * Zscale;
-                    xVel = deltaX / Time.deltaTime * 2.5f * Xscale;
+                    zVel = ballDeltaZ / Time.deltaTime  * Zscale;
+                    xVel = ballDeltaX / Time.deltaTime  * Xscale;
 
                     if (motorRoll > 0)
                     {
@@ -324,10 +247,9 @@ public class BallController : MonoBehaviour
                         }
                     }
                     
-               
-
 
                 }
+
             }
 
 

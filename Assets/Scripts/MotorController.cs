@@ -49,13 +49,11 @@ public class MotorController : MonoBehaviour
 
 
         //serialController = GameObject.Find("SerialController").GetComponent<SerialController>();
-        _serialPort = new SerialPort();
-        motor.set(portName, baudRate, ReadTimeout, QueueLength);
-        motor.connect();
+        //_serialPort = new SerialPort();
+        //motor.set(portName, baudRate, ReadTimeout, QueueLength);
+        //motor.connect();
 
-        Debug.Log("motor connected-----------------------------------------------------");
-
-
+  
         //// Change com port
         //_serialPort.PortName = "COM10";
         //// Change baud rate
@@ -66,15 +64,15 @@ public class MotorController : MonoBehaviour
         //_serialPort.ReadTimeout = 2;
         //_serialPort.WriteTimeout = 2;
 
-        try
-        {
-            _serialPort.Open();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e);
-            IsConnected = false;
-        }
+        //try
+        //{
+        //    _serialPort.Open();
+        //}
+        //catch (Exception e)
+        //{
+        //    Debug.LogError(e);
+        //    IsConnected = false;
+        //}
 
     }
 
