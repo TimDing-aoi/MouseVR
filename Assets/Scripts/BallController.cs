@@ -78,10 +78,13 @@ public class BallController : MonoBehaviour
         ball.set(portName, baudRate, ReadTimeout, QueueLength);
 
         //if MC not active, connect directly. if MC active, connect after 15 seconds
-        if (!keyboard)
-        {
-            ball.connect();
-        }
+
+        //if (!keyboard)
+        //{
+        //    ball.connect();
+        //}
+        ball.connect();
+
 
         mcActive = (int)PlayerPrefs.GetFloat("Enable MC") == 1;
         if(mcActive)
@@ -138,19 +141,17 @@ public class BallController : MonoBehaviour
             {
 
 
-                ////////////////needs to be commented out for keyboard simulation, otherwise will stuck at ball.readQueue()///////////////////////
-
-                //string ball_input = ball.readQueue();
-                //string[] line = ball_input.Split(',');
+                string ball_input = ball.readQueue();
+                string[] line = ball_input.Split(',');
                 //print(ball_input);
 
 
-                //pitch = float.Parse(line[0]);
-                //roll = float.Parse(line[1]);
-                //yaw = float.Parse(line[2]);
-                //yawCopy = yaw;
+                pitch = float.Parse(line[0]);
+                roll = float.Parse(line[1]);
+                yaw = float.Parse(line[2]);
+                yawCopy = yaw;
 
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
                 // calibrate once a week
                 ballDeltaZ = pitch * -0.0085384834f * 3f;
@@ -194,8 +195,8 @@ public class BallController : MonoBehaviour
 
                     // 1 = 50 deg/s
                     // roll / Time.deltaTime = 1/0.2 = 50 deg/s
-                    yawVel = kb_hor / Time.deltaTime * 1.5f;
-
+                    //yawVel = kb_hor / Time.deltaTime * 1.5f;
+                    yawVel = kb_hor / Time.deltaTime;
                 }
                 else
                 {

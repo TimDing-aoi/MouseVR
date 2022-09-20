@@ -19056,7 +19056,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1150459178
 Transform:
   m_ObjectHideFlags: 0
@@ -31002,6 +31002,7 @@ MonoBehaviour:
   initialD: 0
   player_origin: {x: 0, y: 0, z: 0}
   playing: 1
+  mcStopFlag: 0
   ramp: 0
   rampTime: 0
   rampDelay: 0

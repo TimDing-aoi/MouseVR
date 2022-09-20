@@ -154,8 +154,15 @@ public class MotionCueingController : MonoBehaviour
                 if (flagMCActive && SharedReward.playing)
                 {
                    // Debug.Log("timeeeeeeeeee" + Time.time);
+                    if (SharedReward.mcStopFlag)
+                    {
+                        motionCueing.Calculate(0, 0, angSpeed, 0, (uint)i, 0, IsStop);
+                    }
+                    else
+                    {
+                        motionCueing.Calculate(mcSpeed, 0, angSpeed, 0, (uint)i, 0, IsStop);
+                    }
                     
-                    motionCueing.Calculate(mcSpeed, 0, angSpeed, 0, (uint)i, 0, IsStop);
                 }
             }
         }
@@ -229,7 +236,7 @@ public class MotionCueingController : MonoBehaviour
                 mcSpeed = locMaxSpeed - numOfFrames * 0.0076;
 
                 Debug.Log("MC speed is :           " + mcSpeed);
-                Debug.Log("current speed is :      " + curSpeed);
+                //Debug.Log("current speed is :      " + curSpeed);
 
                 //if ((mcSpeed - curSpeed < 0.11f) && (mcSpeed - curSpeed > 0))
                 //{
@@ -538,6 +545,8 @@ public class MotionCueingController : MonoBehaviour
 
     async void ActivateMotionCueing()
     {
+
+
         // safety measure
         StartCoroutine(WaitCoroutine());
 

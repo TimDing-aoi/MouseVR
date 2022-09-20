@@ -296,6 +296,7 @@ public class RewardArena : MonoBehaviour
 
     private StringBuilder sb = new StringBuilder();
     public bool playing = true;
+    public bool mcStopFlag = false;
 
     public bool ramp;
     public float rampTime;
@@ -1076,66 +1077,97 @@ public class RewardArena : MonoBehaviour
 
             //print(String.Format("head_dir: {0}, lick: {1}, sync: {2}", head_dir, lick, sync_ttl));
 
-            if (activeMC)
+
+
+            if (areWalls > 0)
             {
-
-                zVel = (float)motionCueingController.curSpeed;
-                xVel = (float)motionCueingController.motionCueing.filtered[1][2];
-                yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
-
-
-            }
-            else
-            {
-                // calibration does not seem to give right numbers
-                zVel = Ball.zVel*gain;
-                yawVel = Ball.yawVel*gain;
-                xVel = Ball.xVel*gain;
-
-                
-
-                var vr_arena_limit = 0.21f;
-                var futurePlayer = player;
-
-                UpdatePlayerPosition(futurePlayer, zVel, xVel, yawVel);
-
-                if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit))
+                if (activeMC)
                 {
-                    zVel = 0;
-                    player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                    Debug.Log("z zero-------------" + xVel);
+                    mcStopFlag = false;
+
+                    zVel = (float)motionCueingController.curSpeed;
+                    xVel = (float)motionCueingController.motionCueing.filtered[1][2];
+                    yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
+
+
+                    // only in activeMC we need to limit the speed to a hardcoded value
+                    if (zVel > 0.2f)
+                    {
+                        zVel = 0.2f;
+                    }
+
+                    float vr_arena_limit = 100f;
+                    if (areWalls == 1)
+                    {
+                        vr_arena_limit = 0.23f;
+                    }
+                    if (areWalls == 2)
+                    {
+                        vr_arena_limit = 0.45f;
+                    }
+
+                    var futurePlayer = player;
+
+                    UpdatePlayerPosition(futurePlayer, zVel, xVel, yawVel);
+
+                    if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit))
+                    {
+                        zVel = 0;
+                        player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                        mcStopFlag = true;
+                    }
 
                 }
+                else
+                {
+                    // calibration does not seem to give right numbers
+                    zVel = Ball.zVel * gain;
+                    yawVel = Ball.yawVel * gain;
+                    xVel = Ball.xVel * gain;
 
+                    var vr_arena_limit = 0.23f;
+                    var futurePlayer = player;
 
-                //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
+                    UpdatePlayerPosition(futurePlayer, zVel, xVel, yawVel);
 
-                //if (autoIdx > 300 && autoGain < 1.0f)
-                //{
-                //    autoGain += 1f / 60f;
-                //    autoIdx++;
-                //}
+                    if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit))
+                    {
+                        zVel = 0;
+                        player.GetComponent<Rigidbody>().velocity = Vector3.zero;
 
-                //switch (dim)
-                //{
-                //    case 1:
-                //        var currYaw = accelController.gyroY;
-                //        yawVel = ((currYaw - prevYaw) * Mathf.Rad2Deg) / Time.deltaTime;
-                //        prevYaw = currYaw;
-                //        break;
+                    }
 
-                //    case 2:
-                //        //deltaYaw = Ball.yaw * 0.1713298528f;
-                //        deltaYaw = Ball.yaw;
-                //        yawVel = deltaYaw / Time.deltaTime;
-                //        break;
+                    //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
 
-                //    default:
-                //        deltaYaw = Ball.yaw * 0.1713298528f;
-                //        yawVel = deltaYaw / Time.deltaTime;
-                //        break;
-                //}
+                    //if (autoIdx > 300 && autoGain < 1.0f)
+                    //{
+                    //    autoGain += 1f / 60f;
+                    //    autoIdx++;
+                    //}
+
+                    //switch (dim)
+                    //{
+                    //    case 1:
+                    //        var currYaw = accelController.gyroY;
+                    //        yawVel = ((currYaw - prevYaw) * Mathf.Rad2Deg) / Time.deltaTime;
+                    //        prevYaw = currYaw;
+                    //        break;
+
+                    //    case 2:
+                    //        //deltaYaw = Ball.yaw * 0.1713298528f;
+                    //        deltaYaw = Ball.yaw;
+                    //        yawVel = deltaYaw / Time.deltaTime;
+                    //        break;
+
+                    //    default:
+                    //        deltaYaw = Ball.yaw * 0.1713298528f;
+                    //        yawVel = deltaYaw / Time.deltaTime;
+                    //        break;
+                    //}
+                }
             }
+
+
 #if CALIBRATING
             // for some reason these numbers do not work, try to calibrate using a static floor with a defined 
             // pattern and see how pattern moves with the ball movement
@@ -1172,8 +1204,6 @@ public class RewardArena : MonoBehaviour
             }
 #endif
 
-
-
             //if (zVel > velMax)
             //{
             //    zVel = velMax;
@@ -1198,6 +1228,8 @@ public class RewardArena : MonoBehaviour
             //{
             //    yawVel = rotMin;
             //}
+
+
 
             //if (areWalls == 1f)
             //{
