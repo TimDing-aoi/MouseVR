@@ -65,16 +65,21 @@ public class JuiceController : MonoBehaviour
     void Update()
     {
         Keyboard keyboard = Keyboard.current;
-       
+
+
         if (keyboard.spaceKey.wasReleasedThisFrame && giveJuice)
         {
             giveJuice = false;
             GiveJuice(60);
+
         }
     }
 
     public async void GiveJuice(float time)
     {
+
+        
+
         string toSend;
 
         if (time < 10.0f)
@@ -98,6 +103,9 @@ public class JuiceController : MonoBehaviour
         {
             _serialPort.Write(toSend);
         }
+
+
+
         await new WaitForFixedUpdate();
         giveJuice = true;
     }

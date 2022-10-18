@@ -7,6 +7,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class BallController : MonoBehaviour
 {
+    //
     //SerialPort _serialPort;
     wrmhl ball = new wrmhl();
     public static BallController Ball;
@@ -40,6 +41,7 @@ public class BallController : MonoBehaviour
     private float initDelay;
     public bool IsConnected = true;
     public bool mcActive;
+
 
     public string portName = "COM11";
     public int baudRate = 2000000;
@@ -78,10 +80,12 @@ public class BallController : MonoBehaviour
         ball.set(portName, baudRate, ReadTimeout, QueueLength);
 
         //if MC not active, connect directly. if MC active, connect after 15 seconds
-        if (!keyboard)
-        {
-            ball.connect();
-        }
+        //if (!keyboard)
+        //{
+        //    ball.connect();
+        //}
+        ball.connect();
+        
 
         mcActive = (int)PlayerPrefs.GetFloat("Enable MC") == 1;
         if(mcActive)
@@ -138,19 +142,22 @@ public class BallController : MonoBehaviour
             {
 
 
-                ////////////////needs to be commented out for keyboard simulation, otherwise will stuck at ball.readQueue()///////////////////////
 
-                //string ball_input = ball.readQueue();
-                //string[] line = ball_input.Split(',');
-                //print(ball_input);
+                if (!keyboard)
+                {
+                    string ball_input = ball.readQueue();
+                    string[] line = ball_input.Split(',');
+                    // print(ball_input);
 
 
-                //pitch = float.Parse(line[0]);
-                //roll = float.Parse(line[1]);
-                //yaw = float.Parse(line[2]);
-                //yawCopy = yaw;
+                    pitch = float.Parse(line[0]);
+                    roll = float.Parse(line[1]);
+                    yaw = float.Parse(line[2]);
+                    yawCopy = yaw;
 
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                }
+
+
 
                 // calibrate once a week
                 ballDeltaZ = pitch * -0.0085384834f * 3f;
@@ -184,7 +191,7 @@ public class BallController : MonoBehaviour
 
                     kb_vert = Input.GetAxis("Vertical");
                     //     1 / 0.2 second / 100 = 50 cm/s
-                    zVel = kb_vert / Time.deltaTime/100/2f;
+                    zVel = kb_vert / Time.deltaTime/100/2.5f;
 
 
                 
@@ -192,9 +199,11 @@ public class BallController : MonoBehaviour
                     xVel = kb_hor / Time.deltaTime/20/5;
 
 
+
                     // 1 = 50 deg/s
                     // roll / Time.deltaTime = 1/0.2 = 50 deg/s
-                    yawVel = kb_hor / Time.deltaTime * 1.5f;
+                    yawVel = kb_hor / Time.deltaTime;
+                    // yawVel = 5.5f;
 
                 }
                 else
@@ -212,19 +221,13 @@ public class BallController : MonoBehaviour
                     }
 
 
-
-                    //deltaZ = pitch * -1 * Zscale;
-                    //deltaX = roll * -1 * Xscale;
-                    //deltaYaw = yaw * Yawscale;
-
                     zVel = ballDeltaZ / Time.deltaTime  * Zscale;
                     xVel = ballDeltaX / Time.deltaTime  * Xscale;
 
                     if (motorRoll > 0)
                     {
                         yawVel = 0;
-                        //zVel = 0;
-                        //xVel = 0;
+
                         // rotate when mice run at angle| tan45 = 1; tan60 = 1.73; tan75 = 3.73 (30 deg forward run area)
                         if (Math.Abs(zVel) / Math.Abs(xVel) < 2.73 & Math.Abs(xVel) > 0.015f)
                             //if (Math.Abs(roll) > 0.03f)
@@ -246,9 +249,19 @@ public class BallController : MonoBehaviour
                
                         }
                     }
+
+                    //// ignore yaw vel that is too small. 6 degree/s is the threshold for the yaw motor to respond
+                    if (yawVel > -6 && yawVel < 6)
+                    {
+                        yawVel = 0;
+
+                    }
+
+
                     
 
                 }
+                // print("ball yaw ----------------------- " + yaw);
 
             }
 

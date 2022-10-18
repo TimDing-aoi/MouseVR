@@ -51,6 +51,8 @@ using System;
 //using System.IO.Ports;
 //using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.CodeDom.Compiler;
 
 public class RewardArena : MonoBehaviour
 {
@@ -296,6 +298,9 @@ public class RewardArena : MonoBehaviour
 
     private StringBuilder sb = new StringBuilder();
     public bool playing = true;
+    public bool mcStopFlag = false;
+    public float lastPlayerX = 0f;
+    public float lastPlayerZ = 0f;
 
     public bool ramp;
     public float rampTime;
@@ -371,8 +376,11 @@ public class RewardArena : MonoBehaviour
     List<int> TTLCopy = new List<int>();
     float timeSinceLastSave = 0.0f;
     int idx = 0;
-    
- 
+
+    private Queue<float[]> prevFrameData = new Queue<float[]>();
+
+
+
     bool flagMotionCue = true;
     bool flagMotionCueActive = false;
 
@@ -435,6 +443,8 @@ public class RewardArena : MonoBehaviour
     /// </summary>
     void Start()
     {
+
+
         session_starttime = (int)Time.realtimeSinceStartup;
 
         QualitySettings.vSyncCount = 0;
@@ -442,6 +452,8 @@ public class RewardArena : MonoBehaviour
         //Physics2D.autoSimulation = false;
         
         SharedReward = this;
+
+
 
         try
         {
@@ -474,7 +486,8 @@ public class RewardArena : MonoBehaviour
         GameObject dd = GameObject.Find("DataDiagram");
         if (null == dd)
         {
-            Debug.LogWarning("can not find a gameobject of DataDiagram");
+            // Debug.LogWarning("can not find a gameobject of DataDiagram");
+            print("can not find a gameobject of DataDiagram");
             return;
         }
         m_DataDiagram = dd.GetComponent<DD_DataDiagram>();
@@ -539,7 +552,8 @@ public class RewardArena : MonoBehaviour
         {
             yaw_flag = 0;
         }
-        Debug.Log(yaw_flag);
+        // Debug.Log(yaw_flag);
+        print(yaw_flag);
         minDrawDistance = PlayerPrefs.GetFloat("Minimum Firefly Distance");
         maxDrawDistance = PlayerPrefs.GetFloat("Maximum Firefly Distance");
         LR = PlayerPrefs.GetFloat("Left Right");
@@ -766,9 +780,10 @@ public class RewardArena : MonoBehaviour
 
         //print(contPath);
         // string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ, zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,TTL,Tx,Ty,Tz,Rx,Ry,Rz,head_dir";
+
         string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,DistalOnOff,DistalRotation,balldZ,balldX,balldYaw,surge,lateral,heave,roll,pitch,yaw,AccX,AccY,AccZ,GyroX,GyroY,GyroZ";
 
-        
+
 
         File.AppendAllText(contPath, firstLine + "\n");
 
@@ -784,7 +799,15 @@ public class RewardArena : MonoBehaviour
             currPhase = Phases.begin;
             phase = Phases.begin;
         }
-  
+
+        //if (activeMC)
+        //{
+        //    prevFrameData.Enqueue(new float[] { 0, 0, 0 });
+        //    prevFrameData.Enqueue(new float[] { 0, 0, 0 });
+        //}
+
+
+
 
         dt_test = 0.0f;
 
@@ -1076,37 +1099,117 @@ public class RewardArena : MonoBehaviour
 
             //print(String.Format("head_dir: {0}, lick: {1}, sync: {2}", head_dir, lick, sync_ttl));
 
+            float vr_arena_limit = 1000f;
+            if (areWalls == 1)
+            {
+                vr_arena_limit = 0.24f;
+            }
+            if (areWalls == 2)
+            {
+                vr_arena_limit = 0.47f;
+            }
+
             if (activeMC)
             {
+                mcStopFlag = false;
 
-                zVel = (float)motionCueingController.curSpeed;
+                zVel = (float)motionCueingController.motionCueing.filtered[0][2];
                 xVel = (float)motionCueingController.motionCueing.filtered[1][2];
                 yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
+
+                lastPlayerX = player.transform.position.x;
+                lastPlayerZ = player.transform.position.z;
+
+
+                // only in activeMC we need to limit the speed to a hardcoded value
+                if (zVel > 0.2f)
+                {
+                    zVel = 0.2f;
+                }
+
+                //// ignore yaw vel that is too small. 6 degree/s is the threshold for the yaw motor to respond
+                //if (yawVel > -6 && yawVel < 6)
+                //{
+                //    yawVel = 0;
+
+                //}
+
+                print("player eulerAngles --------------------- " + player.transform.eulerAngles.ToString("F5").Trim(toTrim).Replace(" ", ""));
+
+                //var futurePlayer = player;
+
+                //UpdatePlayerPosition(futurePlayer, zVel, xVel, yawVel);
+
+                ////////////////////////////////////////////////////This part is for visual delay////////////////////////////////////////////////////
+
+                var futurePlayer = player;
+
+                float[] curFrameData = { zVel, xVel, yawVel };
+
+                prevFrameData.Enqueue(curFrameData);
+
+                if (prevFrameData.Count > 3)
+                {
+                    float[] lastFrameData = prevFrameData.Dequeue();
+
+
+                    var delayedZ = lastFrameData[0];
+                    var delayedX = lastFrameData[1];
+                    var delayedYaw = lastFrameData[2];
+
+
+                    UpdatePlayerPosition(futurePlayer, delayedZ, delayedX, delayedYaw);
+
+                }
+                else
+                {
+                    UpdatePlayerPosition(futurePlayer, 0, 0, 0);
+                }
+
+                ////////////////////////////////////////////////////This part is for visual delay////////////////////////////////////////////////////
+
+
+                if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) && Mathf.Abs(lastPlayerX) < Mathf.Abs(futurePlayer.transform.position.x)
+                    || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit) && Mathf.Abs(lastPlayerZ) < Mathf.Abs(futurePlayer.transform.position.z))
+                {
+
+                    mcStopFlag = true;
+                    zVel = 0;
+                    player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                        
+                }
 
 
             }
             else
             {
                 // calibration does not seem to give right numbers
-                zVel = Ball.zVel*gain;
-                yawVel = Ball.yawVel*gain;
-                xVel = Ball.xVel*gain;
+                zVel = Ball.zVel * gain;
+                xVel = Ball.xVel * gain;
+                yawVel = Ball.yawVel * gain;
 
-                
 
-                var vr_arena_limit = 0.21f;
+
+                lastPlayerX = player.transform.position.x;
+                lastPlayerZ = player.transform.position.z;
+
+
                 var futurePlayer = player;
 
                 UpdatePlayerPosition(futurePlayer, zVel, xVel, yawVel);
 
-                if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit))
+
+
+
+                if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) && Mathf.Abs(lastPlayerX) < Mathf.Abs(futurePlayer.transform.position.x)
+                    || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit) && Mathf.Abs(lastPlayerZ) < Mathf.Abs(futurePlayer.transform.position.z))
                 {
                     zVel = 0;
                     player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                    Debug.Log("z zero-------------" + xVel);
 
                 }
 
+                //Debug.Log("Player Position: X = " + futurePlayer.transform.position.x + " --- Y = " + futurePlayer.transform.position.y);
 
                 //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
 
@@ -1136,6 +1239,8 @@ public class RewardArena : MonoBehaviour
                 //        break;
                 //}
             }
+
+            
 #if CALIBRATING
             // for some reason these numbers do not work, try to calibrate using a static floor with a defined 
             // pattern and see how pattern moves with the ball movement
@@ -1248,7 +1353,7 @@ public class RewardArena : MonoBehaviour
 
 
 
-            UpdatePlayerPosition(player, zVel, xVel, yawVel);
+            //UpdatePlayerPosition(player, zVel, xVel, yawVel);
 
             //switch ((int)yaw_flag)
             //{
@@ -1336,6 +1441,10 @@ public class RewardArena : MonoBehaviour
             //    onoff.Add(firefly.activeInHierarchy);
             //}
             //activeMC = true;
+
+            //Debug.Log("accelController connected? : " + accelController.IsConnected);
+            //Debug.Log("accelController reading    : " + accelController.reading);
+
             if (activeMC)
                 {
 
@@ -1369,6 +1478,7 @@ public class RewardArena : MonoBehaviour
                     motionCueingController.motionCueing.frame.pitch,
                     motionCueingController.motionCueing.frame.yaw,
                     accelController.IsConnected ? accelController.reading : "0,0,0,0,0,0"
+
                     ) + "\n");
                 //string.Join(",", labJackController.ValueAIN)) + "\n");
 
@@ -1402,7 +1512,9 @@ public class RewardArena : MonoBehaviour
                     ) + "\n");
                     //string.Join(",", labJackController.ValueAIN)) + "\n");
                 }
-                // playing
+            // playing
+
+
         }
         score = 0;
         timedout = 0;
@@ -1565,7 +1677,7 @@ public class RewardArena : MonoBehaviour
 
     async void Startup()
     {
-        await new WaitForSeconds(15.0f);
+        // await new WaitForSeconds(15.0f);
 
         currPhase = Phases.begin;
         phase = Phases.begin;

@@ -10090,7 +10090,7 @@ Camera:
     m_Bits: 23
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 3
+  m_TargetDisplay: 5
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
@@ -10719,7 +10719,7 @@ Camera:
     m_Bits: 1
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 5
+  m_TargetDisplay: 3
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
@@ -12404,7 +12404,7 @@ Camera:
     m_Bits: 1559
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 4
+  m_TargetDisplay: 2
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0
@@ -14054,6 +14054,7 @@ MonoBehaviour:
   accZ: 0
   reading: 
   IsConnected: 1
+  line: []
 --- !u!4 &1079647249
 Transform:
   m_ObjectHideFlags: 0
@@ -19056,7 +19057,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1150459178
 Transform:
   m_ObjectHideFlags: 0
@@ -31002,6 +31003,7 @@ MonoBehaviour:
   initialD: 0
   player_origin: {x: 0, y: 0, z: 0}
   playing: 1
+  mcStopFlag: 0
   ramp: 0
   rampTime: 0
   rampDelay: 0
@@ -33220,7 +33222,7 @@ Camera:
     m_Bits: 23
   m_RenderingPath: 0
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 2
+  m_TargetDisplay: 4
   m_TargetEye: 3
   m_HDR: 0
   m_AllowMSAA: 0

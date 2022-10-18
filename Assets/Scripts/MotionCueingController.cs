@@ -56,6 +56,7 @@ public class MotionCueingController : MonoBehaviour
     public double prevSpeed = 0;
     public double decayRate = 0.00005;
     public double locMaxSpeed = 0;
+    public double origionalSpeed = 0;
 
     public int numOfFrames = 0;
 
@@ -76,13 +77,11 @@ public class MotionCueingController : MonoBehaviour
         limit6 = PlayerPrefs.GetFloat("Limit 6") == 0f ? 150 : (double)PlayerPrefs.GetFloat("Limit 6");
         maxVelX = PlayerPrefs.GetFloat("Max X Vel") == 0f ? 1 : (double)PlayerPrefs.GetFloat("Max X Vel");
         maxVelY = PlayerPrefs.GetFloat("Max Y Vel") == 0f ? 1 : (double)PlayerPrefs.GetFloat("Max Y Vel");
-        maxVelAng = PlayerPrefs.GetFloat("Max Ang Vel") == 0f ? 90 : (double)PlayerPrefs.GetFloat("Max Ang Vel");
+        maxVelAng = PlayerPrefs.GetFloat("Max Ang Vel") == 0f ? 200 : (double)PlayerPrefs.GetFloat("Max Ang Vel");
 
         keyboard = Keyboard.current;
 
         DontDestroyOnLoad(this);
-
-
 
         //#if ACTIVE
         //#if TEST
@@ -113,6 +112,67 @@ public class MotionCueingController : MonoBehaviour
         }
     }
 
+    //public void speedDecay()
+    //{
+
+    //}
+
+    public void linearSpeedControll()
+    {
+
+        if (ballSpeed > 0.2f)
+        {
+            ballSpeed = 0.2f;
+        }
+        else if (ballSpeed < 0)
+        {
+            ballSpeed = 0;
+        }
+
+
+        prevSpeed = curSpeed;
+        curSpeed = ballSpeed;
+
+
+        // apply a linear decay on the burst negative acceleration
+        if (curSpeed < prevSpeed || (mcSpeed - curSpeed < 0.05f && mcSpeed - curSpeed > 0) || SharedReward.mcStopFlag && mcSpeed > 0.03f)
+        {
+
+            numOfFrames++;
+            mcSpeed = locMaxSpeed - numOfFrames * 0.0076;
+
+            if (SharedReward.mcStopFlag)
+            {
+                mcSpeed = 0;
+            }
+
+
+        }
+        else
+        {
+            locMaxSpeed = ballSpeed;
+            numOfFrames = 0;
+            mcSpeed = ballSpeed;
+        }
+
+        // apply a linear growth on the burst positive acceleration
+        if (curSpeed > prevSpeed && (curSpeed - prevSpeed)/ Time.deltaTime > 0.3)
+        {
+            origionalSpeed = prevSpeed;
+            numOfFrames++;
+            mcSpeed = locMaxSpeed + numOfFrames * 0.0076;
+        }
+        else
+        {
+            origionalSpeed = ballSpeed;
+            numOfFrames = 0;
+            mcSpeed = ballSpeed;
+        }
+
+
+    }
+
+
     private void Update()
     {
         //#if TEST
@@ -138,6 +198,18 @@ public class MotionCueingController : MonoBehaviour
         //            //motionCueing.Calculate(0, 0, 0, 0, (uint)i, 0, true);
         //        }
 
+        if (active)
+        {
+
+            ballSpeed = Ball.zVel;
+            angSpeed = Ball.yawVel;
+
+            linearSpeedControll();
+
+            // ask Jean whether we can use roll in MC
+            IsStop = SharedReward.IsStop;
+
+        }
 
         if (active)
         {
@@ -146,23 +218,22 @@ public class MotionCueingController : MonoBehaviour
                 if (flagMCActive && i < x.Count)
                 {
                     if (!flagStart) flagStart = true;
+                    
                     motionCueing.Calculate(x[i], y[i], yaw[i], 0, (uint)i, 0, i == t.Count - 1);
+
                 }
             }
             else
             {
                 if (flagMCActive && SharedReward.playing)
                 {
-                   // Debug.Log("timeeeeeeeeee" + Time.time);
-                    
+
                     motionCueing.Calculate(mcSpeed, 0, angSpeed, 0, (uint)i, 0, IsStop);
+
                 }
             }
         }
-        else
-        {
-            
-        }
+
 
         i++;
 
@@ -190,102 +261,20 @@ public class MotionCueingController : MonoBehaviour
     //#endif
     private void FixedUpdate()
     {
-
-        bool speedIsDecaying = false;
         
 
-        if (active)
-        {
-            // calibrated values
+        //if (active)
+        //{
 
+        //    ballSpeed = Ball.zVel;
+        //    angSpeed = Ball.yawVel;
 
-            ballSpeed = Ball.zVel;
-            angSpeed = Ball.yawVel;
+        //    linearSpeedControll();
 
+        //    // ask Jean whether we can use roll in MC
+        //    IsStop = SharedReward.IsStop;
 
-            if (ballSpeed > 0.2f)
-            {
-                ballSpeed = 0.2f;
-            }
-            else if (ballSpeed < 0)
-            {
-                ballSpeed = 0;
-            }
-
-            prevSpeed = curSpeed;
-            curSpeed = ballSpeed;
-
-            
-
-
-
-            if (curSpeed < prevSpeed || ( mcSpeed - curSpeed < 0.05f && mcSpeed - curSpeed > 0 ) )
-            {
-
-                //mcSpeed = ballSpeed;
-                //mcSpeed += (prevSpeed - curSpeed) / 2;
-
-                numOfFrames++;
-                mcSpeed = locMaxSpeed - numOfFrames * 0.0076;
-
-                Debug.Log("MC speed is :           " + mcSpeed);
-                Debug.Log("current speed is :      " + curSpeed);
-
-                //if ((mcSpeed - curSpeed < 0.11f) && (mcSpeed - curSpeed > 0))
-                //{
-                //    Debug.Log("statement is true");
-                //}
-                //else
-                //{
-                //    Debug.Log("statement is false");
-                //}
-            }
-            else
-            {
-                locMaxSpeed = ballSpeed;
-                numOfFrames = 0;
-                mcSpeed = ballSpeed;
-            }
-
-
-            //if (curSpeed < prevSpeed && curSpeed > 0)
-            //{
-            //    Debug.Log(curSpeed);
-            //    Debug.Log(prevSpeed);
-            //    Debug.Log("adjesting1111111111111111111-------------" + numOfFrames);
-            //    speedIsDecaying = true;
-            //    numOfFrames += 1;
-            //    mcSpeed = ballSpeed + numOfFrames * 0.0076f;
-            //    Debug.Log(mcSpeed);
-            //    //mcSpeed += (mcSpeed - curSpeed) / 2;
-            //} else
-            //{
-            //    Debug.Log("adjesting2222222222222222222-------------" + numOfFrames);
-            //    numOfFrames = 0;
-            //    mcSpeed -= 0.0076f;
-            //    Debug.Log(mcSpeed);
-            //}
-
-
-            //else if (curSpeed == 0 && curSpeed == prevSpeed && mcSpeed > 0)
-            //{
-            //    speedIsDecaying = false;
-            //    numOfFrames = 0;
-            //    mcSpeed -= 0.0076f;
-
-            //}
-
-            //else if (curSpeed > prevSpeed && mcSpeed > curSpeed)
-            //{
-
-            //}
-
-
-
-            // ask Jean whether we can use roll in MC
-            IsStop = SharedReward.IsStop;
-
-        }
+        //}
     }
     public async Task StopMovement()
     {
@@ -539,7 +528,7 @@ public class MotionCueingController : MonoBehaviour
     async void ActivateMotionCueing()
     {
         // safety measure
-        StartCoroutine(WaitCoroutine());
+        // StartCoroutine(WaitCoroutine());
 
         //Task<int> currentTask;
         //Task<int> mcTask;
@@ -1520,11 +1509,12 @@ public class CMotionCueing : IDisposable
 
             byte[] msg = msgID.Concat(Tx).Concat(Ty).Concat(Tz).Concat(Rx).Concat(Ry).Concat(Rz).Concat(Outputs).Concat(EoT).ToArray();
 
-            //MonoBehaviour.print(msg.Length);
+
+
+            
 
             hexaStream.Write(msg, 0, 60);
 
-            //return Time.realtimeSinceStartup - tNow;
         }
 
         public void SetFrame()

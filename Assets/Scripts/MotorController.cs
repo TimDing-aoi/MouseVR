@@ -99,7 +99,7 @@ public class MotorController : MonoBehaviour
 
 
 
-        yaw = deltaYaw;
+
         //print(yaw);
 
         //if (yaw > 0)
@@ -142,7 +142,7 @@ public class MotorController : MonoBehaviour
         //    }
         //}
 
-        /*--------------------------------------------------------
+ 
 
         // -1, 1 min, max ang vel
         if (yawVel > 1)
@@ -154,8 +154,8 @@ public class MotorController : MonoBehaviour
         {
             yawVel = -1.0f;
         }
-        
-        --------------------------------------------------------*/
+
+   
 
         value = yawVel * 2.5f + 2.5f;
         //serialController.SendSerialMessage(idx.ToString());
@@ -164,6 +164,10 @@ public class MotorController : MonoBehaviour
         {
        
             labJackController.ExecuteDACRequest(value);
+
+
+            // print("motor yaw ----------------------- " + value);
+
             //Debug.Log(value);
 
             //serialController.SendSerialMessage(value.ToString());
