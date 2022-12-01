@@ -58,7 +58,9 @@ public class RingSensor : MonoBehaviour
 
             //string[] line = reading.Split(',');
 
-            dir = float.Parse(reading);
+            //dir = float.Parse(reading);
+
+            // print("dir-------------" + reading);
 
             updatesCounter = 0;
 
@@ -76,7 +78,8 @@ public class RingSensor : MonoBehaviour
         }
         catch (Exception e)
         {
-            //UnityEngine.Debug.LogError(e);
+            UnityEngine.Debug.LogError(e);
+            print("ring disconnected");
             updatesCounter++;
             if (updatesCounter % 100 == 0)
                 PlayerPrefs.SetString("Ring State", "Disconnected");

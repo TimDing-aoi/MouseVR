@@ -14042,7 +14042,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a44dec6d879a3946b143f05efcb2c61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  portName: COM4
+  portName: COM40
   baudRate: 2000000
   ReadTimeout: 5000
   QueueLength: 1
@@ -31160,7 +31160,7 @@ MonoBehaviour:
   hor: 0
   IsConnected: 1
   mcActive: 0
-  portName: COM11
+  portName: COM4
   baudRate: 2000000
   ReadTimeout: 5000
   QueueLength: 1

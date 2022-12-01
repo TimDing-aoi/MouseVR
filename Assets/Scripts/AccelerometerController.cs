@@ -9,7 +9,7 @@ public class AccelerometerController : MonoBehaviour
 {
 
     wrmhl accel = new wrmhl();
-    public string portName = "COM4";
+    public string portName = "COM40";
     public int baudRate = 2000000;
     public int ReadTimeout = 5000;
     public int QueueLength = 1;
