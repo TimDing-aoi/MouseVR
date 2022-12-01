@@ -25,7 +25,7 @@
 /// win; otherwise, they lose. This repeats until the user exits the application.       ///
 /// </summary>                                                                          ///
 ///////////////////////////////////////////////////////////////////////////////////////////
-#undef CALIBRATING
+def CALIBRATING
 //#define MOTIONCUEING
 
 using System.Collections.Generic;
@@ -1096,6 +1096,7 @@ public class RewardArena : MonoBehaviour
                         zVel = 0.2f;
                     }
 
+<<<<<<< Updated upstream
                     float vr_arena_limit = 100f;
                     if (areWalls == 1)
                     {
@@ -1105,17 +1106,30 @@ public class RewardArena : MonoBehaviour
                     {
                         vr_arena_limit = 0.45f;
                     }
+=======
+                //Debug.Log("z vel -------------" + ringSensor.dir);
+                //Debug.Log("y vel -------------" + yawVel);
+                //Debug.Log("x vel -------------" + xVel);
+>>>>>>> Stashed changes
 
                     var futurePlayer = player;
 
                     UpdatePlayerPosition(futurePlayer, zVel, xVel, yawVel);
 
+<<<<<<< Updated upstream
                     if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit))
                     {
                         zVel = 0;
                         player.GetComponent<Rigidbody>().velocity = Vector3.zero;
                         mcStopFlag = true;
                     }
+=======
+                if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit))
+                {
+                    zVel = 0;
+                    player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    // Debug.Log("z zero-------------" + xVel);
+>>>>>>> Stashed changes
 
                 }
                 else

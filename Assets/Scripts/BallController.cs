@@ -41,7 +41,7 @@ public class BallController : MonoBehaviour
     public bool IsConnected = true;
     public bool mcActive;
 
-    public string portName = "COM11";
+    public string portName = "COM4";
     public int baudRate = 2000000;
     public int ReadTimeout = 5000;
     public int QueueLength = 1;
@@ -76,6 +76,7 @@ public class BallController : MonoBehaviour
 
         Ball = this;
         ball.set(portName, baudRate, ReadTimeout, QueueLength);
+        //ball.set("COM4", 2000000);
 
         //if MC not active, connect directly. if MC active, connect after 15 seconds
 
@@ -133,25 +134,43 @@ public class BallController : MonoBehaviour
     {
         try
         {
-            
 
+            //ball.connect();
             float t = Time.time;
             // if mc strat 60s after start
             if (t - initTime > initDelay)
             {
 
 
+<<<<<<< Updated upstream
                 string ball_input = ball.readQueue();
                 string[] line = ball_input.Split(',');
                 //print(ball_input);
+=======
+                //////////////needs to be commented out for keyboard simulation, otherwise will stuck at ball.readQueue()///////////////////////
+
+                string ball_input = ball.readQueue();
+                string[] line = ball_input.Split(',');
+                print(ball_input);
+>>>>>>> Stashed changes
 
 
                 pitch = float.Parse(line[0]);
                 roll = float.Parse(line[1]);
                 yaw = float.Parse(line[2]);
                 yawCopy = yaw;
+<<<<<<< Updated upstream
 
 
+=======
+
+
+                Debug.Log("z vel -------------" + pitch);
+                Debug.Log("y vel -------------" + roll);
+                Debug.Log("x vel -------------" + yaw);
+
+                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+>>>>>>> Stashed changes
 
                 // calibrate once a week
                 ballDeltaZ = pitch * -0.0085384834f * 3f;
