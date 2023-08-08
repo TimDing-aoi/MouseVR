@@ -25,7 +25,7 @@
 /// win; otherwise, they lose. This repeats until the user exits the application.       ///
 /// </summary>                                                                          ///
 ///////////////////////////////////////////////////////////////////////////////////////////
-def CALIBRATING
+#undef CALIBRATING
 //#define MOTIONCUEING
 
 using System.Collections.Generic;
@@ -51,6 +51,8 @@ using System;
 //using System.IO.Ports;
 //using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.CodeDom.Compiler;
 
 public class RewardArena : MonoBehaviour
 {
@@ -297,6 +299,8 @@ public class RewardArena : MonoBehaviour
     private StringBuilder sb = new StringBuilder();
     public bool playing = true;
     public bool mcStopFlag = false;
+    public float lastPlayerX = 0f;
+    public float lastPlayerZ = 0f;
 
     public bool ramp;
     public float rampTime;
@@ -313,6 +317,7 @@ public class RewardArena : MonoBehaviour
     public float yaw_flag;
     public float motorYaw;
     public float motorRoll;
+    public float ring;
 
     private float deltaX;
     private float deltaZ;
@@ -330,7 +335,7 @@ public class RewardArena : MonoBehaviour
 
     private int ttl = 0;
     private int headDirection = 0;
-    private int updatesCounter = 0;
+    public int updatesCounter = 0;
     private int isVisionOff = 0;
 
     [HideInInspector] public bool distalOn;
@@ -372,8 +377,11 @@ public class RewardArena : MonoBehaviour
     List<int> TTLCopy = new List<int>();
     float timeSinceLastSave = 0.0f;
     int idx = 0;
-    
- 
+
+    private Queue<float[]> prevFrameData = new Queue<float[]>();
+
+
+
     bool flagMotionCue = true;
     bool flagMotionCueActive = false;
 
@@ -436,6 +444,8 @@ public class RewardArena : MonoBehaviour
     /// </summary>
     void Start()
     {
+
+
         session_starttime = (int)Time.realtimeSinceStartup;
 
         QualitySettings.vSyncCount = 0;
@@ -443,6 +453,8 @@ public class RewardArena : MonoBehaviour
         //Physics2D.autoSimulation = false;
         
         SharedReward = this;
+
+
 
         try
         {
@@ -475,7 +487,8 @@ public class RewardArena : MonoBehaviour
         GameObject dd = GameObject.Find("DataDiagram");
         if (null == dd)
         {
-            Debug.LogWarning("can not find a gameobject of DataDiagram");
+            // Debug.LogWarning("can not find a gameobject of DataDiagram");
+            print("can not find a gameobject of DataDiagram");
             return;
         }
         m_DataDiagram = dd.GetComponent<DD_DataDiagram>();
@@ -532,6 +545,9 @@ public class RewardArena : MonoBehaviour
 
         motorYaw = PlayerPrefs.GetFloat("motorYaw"); // 0 = 1D (F/B), 1 = 2D (L/R/F/B), 2 - yaw rot
         motorRoll = PlayerPrefs.GetFloat("motorRoll"); // 0 = 1D (F/B), 1 = 2D (L/R/F/B), 2 - yaw rot
+        ring = PlayerPrefs.GetFloat("ring");
+
+
 
         if (motorYaw > 0 || motorRoll > 0)
         {
@@ -540,7 +556,8 @@ public class RewardArena : MonoBehaviour
         {
             yaw_flag = 0;
         }
-        Debug.Log(yaw_flag);
+        // Debug.Log(yaw_flag);
+        print(yaw_flag);
         minDrawDistance = PlayerPrefs.GetFloat("Minimum Firefly Distance");
         maxDrawDistance = PlayerPrefs.GetFloat("Maximum Firefly Distance");
         LR = PlayerPrefs.GetFloat("Left Right");
@@ -766,10 +783,11 @@ public class RewardArena : MonoBehaviour
 
 
         //print(contPath);
-        // string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ, zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,TTL,Tx,Ty,Tz,Rx,Ry,Rz,head_dir";
+        // string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ, zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,TTL,Tx,Ty,Tz,Rx,Ry,Rz,head_dir,MotorPosition";
+
+        //string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,DistalOnOff,DistalRotation,balldZ,balldX,balldYaw,surge,lateral,heave,roll,pitch,yaw,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,MotorPosition";
         string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,DistalOnOff,DistalRotation,balldZ,balldX,balldYaw,surge,lateral,heave,roll,pitch,yaw,AccX,AccY,AccZ,GyroX,GyroY,GyroZ";
 
-        
 
         File.AppendAllText(contPath, firstLine + "\n");
 
@@ -785,7 +803,17 @@ public class RewardArena : MonoBehaviour
             currPhase = Phases.begin;
             phase = Phases.begin;
         }
-  
+
+
+        // number of frames delay = number of items in queue
+        //if (activeMC)
+        //{
+        //    prevFrameData.Enqueue(new float[] { 0, 0, 0 });
+        //    prevFrameData.Enqueue(new float[] { 0, 0, 0 });
+        //}
+
+
+
 
         dt_test = 0.0f;
 
@@ -861,6 +889,7 @@ public class RewardArena : MonoBehaviour
     private void UpdatePlayerPosition(GameObject currentPlayer, float zVel, float xVel, float yawVel)
     {
         switch ((int)yaw_flag)
+
         {
 
             case 0:
@@ -884,6 +913,10 @@ public class RewardArena : MonoBehaviour
 
                 break;
         }
+
+        //if ((int)yaw_flag == 1)
+
+
     }
 
     /// <summary>
@@ -1077,108 +1110,171 @@ public class RewardArena : MonoBehaviour
 
             //print(String.Format("head_dir: {0}, lick: {1}, sync: {2}", head_dir, lick, sync_ttl));
 
-
-
-            if (areWalls > 0)
+            var vr_arena_limit = 1000f;
+            if (areWalls == 1)
             {
-                if (activeMC)
+                vr_arena_limit = 0.28f;
+            }
+            if (areWalls == 2)
+            {
+                vr_arena_limit = 0.47f;
+            }
+
+            if (activeMC)
+            {
+                mcStopFlag = false;
+
+                zVel = (float)motionCueingController.motionCueing.filtered[0][2];
+                xVel = (float)motionCueingController.motionCueing.filtered[1][2];
+                yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
+
+
+                lastPlayerX = player.transform.position.x;
+                lastPlayerZ = player.transform.position.z;
+
+
+                // only in activeMC we need to limit the speed to a hardcoded value
+                if (zVel > 0.2f)
                 {
-                    mcStopFlag = false;
-
-                    zVel = (float)motionCueingController.curSpeed;
-                    xVel = (float)motionCueingController.motionCueing.filtered[1][2];
-                    yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
+                    zVel = 0.2f;
+                }
 
 
-                    // only in activeMC we need to limit the speed to a hardcoded value
-                    if (zVel > 0.2f)
-                    {
-                        zVel = 0.2f;
-                    }
 
-<<<<<<< Updated upstream
-                    float vr_arena_limit = 100f;
-                    if (areWalls == 1)
-                    {
-                        vr_arena_limit = 0.23f;
-                    }
-                    if (areWalls == 2)
-                    {
-                        vr_arena_limit = 0.45f;
-                    }
-=======
-                //Debug.Log("z vel -------------" + ringSensor.dir);
-                //Debug.Log("y vel -------------" + yawVel);
-                //Debug.Log("x vel -------------" + xVel);
->>>>>>> Stashed changes
+                ////////////////////////////////////////////////////This part is for visual delay////////////////////////////////////////////////////
 
-                    var futurePlayer = player;
+                var futurePlayer = player;
 
-                    UpdatePlayerPosition(futurePlayer, zVel, xVel, yawVel);
+                float[] curFrameData = { zVel, xVel, yawVel };
 
-<<<<<<< Updated upstream
-                    if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit))
-                    {
-                        zVel = 0;
-                        player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                        mcStopFlag = true;
-                    }
-=======
-                if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit))
+                prevFrameData.Enqueue(curFrameData);
+
+                if (prevFrameData.Count > 1)
                 {
-                    zVel = 0;
-                    player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                    // Debug.Log("z zero-------------" + xVel);
->>>>>>> Stashed changes
+                    float[] lastFrameData = prevFrameData.Dequeue();
+
+
+                    var delayedZ = lastFrameData[0];
+                    var delayedX = lastFrameData[1];
+                    var delayedYaw = lastFrameData[2];
+
+                    print("yaw vel of the player, read from  MC       -------------------------------- : " + (float)motionCueingController.yawVelR);
+
+                    //if (ring == 1f)
+                    //{
+
+                    //    //UpdatePlayerPosition(futurePlayer, delayedZ, delayedX, (float)motionCueingController.yawVelR);
+                    //    UpdatePlayerPosition(futurePlayer, delayedZ, delayedX, 0);
+
+
+                    //    // player angle will always match the ring angle if this part is uncommented
+                    //    //futurePlayer.transform.eulerAngles = new Vector3(
+                    //    //                    futurePlayer.transform.eulerAngles.x,
+                    //    //                   head_dir,
+                    //    //                    futurePlayer.transform.eulerAngles.z
+                    //    //                );
+                    //}
+                    //else
+                    //{
+
+                    //    UpdatePlayerPosition(futurePlayer, delayedZ, delayedX, delayedYaw);
+                    //}
+
+                    UpdatePlayerPosition(futurePlayer, delayedZ, delayedX, delayedYaw);
+
+
 
                 }
                 else
                 {
-                    // calibration does not seem to give right numbers
-                    zVel = Ball.zVel * gain;
-                    yawVel = Ball.yawVel * gain;
-                    xVel = Ball.xVel * gain;
+                    float[] firstFrame = { 0, 0, 0 };
+                    prevFrameData.Enqueue(firstFrame);
+                    UpdatePlayerPosition(futurePlayer, 0, 0, 0);
 
-                    var vr_arena_limit = 0.23f;
-                    var futurePlayer = player;
-
-                    UpdatePlayerPosition(futurePlayer, zVel, xVel, yawVel);
-
-                    if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit))
-                    {
-                        zVel = 0;
-                        player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-
-                    }
-
-                    //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
-
-                    //if (autoIdx > 300 && autoGain < 1.0f)
-                    //{
-                    //    autoGain += 1f / 60f;
-                    //    autoIdx++;
-                    //}
-
-                    //switch (dim)
-                    //{
-                    //    case 1:
-                    //        var currYaw = accelController.gyroY;
-                    //        yawVel = ((currYaw - prevYaw) * Mathf.Rad2Deg) / Time.deltaTime;
-                    //        prevYaw = currYaw;
-                    //        break;
-
-                    //    case 2:
-                    //        //deltaYaw = Ball.yaw * 0.1713298528f;
-                    //        deltaYaw = Ball.yaw;
-                    //        yawVel = deltaYaw / Time.deltaTime;
-                    //        break;
-
-                    //    default:
-                    //        deltaYaw = Ball.yaw * 0.1713298528f;
-                    //        yawVel = deltaYaw / Time.deltaTime;
-                    //        break;
-                    //}
                 }
+
+                ////////////////////////////////////////////////////This part is for visual delay////////////////////////////////////////////////////
+
+
+                //if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) && Mathf.Abs(lastPlayerX) < Mathf.Abs(futurePlayer.transform.position.x)
+                //    || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit) && Mathf.Abs(lastPlayerZ) < Mathf.Abs(futurePlayer.transform.position.z))
+                //{
+
+                //    mcStopFlag = true;
+                //    zVel = 0;
+                //    //player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                        
+                //}
+
+
+            }
+            else
+            {
+                // calibration does not seem to give right numbers
+                //zVel = Ball.zVel * gain;
+                //xVel = Ball.xVel * gain;
+                //yawVel = Ball.yawVel * gain;
+
+                zVel = Ball.zVel;
+                xVel = Ball.xVel;
+                yawVel = Ball.yawVel;
+
+
+
+                lastPlayerX = player.transform.position.x;
+                lastPlayerZ = player.transform.position.z;
+
+
+                var futurePlayer = player;
+
+                UpdatePlayerPosition(futurePlayer, zVel, xVel, yawVel);
+
+                // arena using yawVelRing
+                //print("---------------------delta yaw from ring : " + Ball.yawVelRing);
+                //UpdatePlayerPosition(futurePlayer, zVel, xVel, Ball.yawVelRing);
+
+
+
+
+                //if (Mathf.Abs(futurePlayer.transform.position.x) > Mathf.Abs(vr_arena_limit) && Mathf.Abs(lastPlayerX) < Mathf.Abs(futurePlayer.transform.position.x)
+                //    || Mathf.Abs(futurePlayer.transform.position.z) > Mathf.Abs(vr_arena_limit) && Mathf.Abs(lastPlayerZ) < Mathf.Abs(futurePlayer.transform.position.z))
+                //{
+                //    zVel = 0;
+                //    //player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+
+                //}
+
+
+
+                //Debug.Log("Player Position: X = " + futurePlayer.transform.position.x + " --- Y = " + futurePlayer.transform.position.y);
+
+                //print(String.Format("zVel: {0}, xVel: {1}, yawVel: {2}", Ball.zVel, Ball.xVel, Ball.yawVel));
+
+                //if (autoIdx > 300 && autoGain < 1.0f)
+                //{
+                //    autoGain += 1f / 60f;
+                //    autoIdx++;
+                //}
+
+                //switch (dim)
+                //{
+                //    case 1:
+                //        var currYaw = accelController.gyroY;
+                //        yawVel = ((currYaw - prevYaw) * Mathf.Rad2Deg) / Time.deltaTime;
+                //        prevYaw = currYaw;
+                //        break;
+
+                //    case 2:
+                //        //deltaYaw = Ball.yaw * 0.1713298528f;
+                //        deltaYaw = Ball.yaw;
+                //        yawVel = deltaYaw / Time.deltaTime;
+                //        break;
+
+                //    default:
+                //        deltaYaw = Ball.yaw * 0.1713298528f;
+                //        yawVel = deltaYaw / Time.deltaTime;
+                //        break;
+                //}
             }
 
 
@@ -1218,6 +1314,8 @@ public class RewardArena : MonoBehaviour
             }
 #endif
 
+
+
             //if (zVel > velMax)
             //{
             //    zVel = velMax;
@@ -1243,62 +1341,47 @@ public class RewardArena : MonoBehaviour
             //    yawVel = rotMin;
             //}
 
+            if (areWalls == 1f)
+            {
 
 
-            //if (areWalls == 1f)
-            //{
-            //    var vr_arena_limit = 0.21f;
+                //if (Mathf.Abs(player.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(player.transform.position.z) > Mathf.Abs(vr_arena_limit))
+                //{
+                //    print("checkpoint 222222222222222-------------");
 
-            //    //Debug.Log("checkpoint 111111111111111-------------");
-
-            //    if (Mathf.Abs(player.transform.position.x) > Mathf.Abs(vr_arena_limit) || Mathf.Abs(player.transform.position.z) > Mathf.Abs(vr_arena_limit))
-            //    {
-            //        Debug.Log("checkpoint 222222222222222-------------");
-            //        //xVel = 0;
-            //        //zVel = 0;
-
-            //        //player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-
-            //        //Debug.Log("player velocity-------------" + );
-            //    }
+                //}
 
 
-            //    if (player.transform.position.x < -vr_arena_limit)
-            //    {
-            //        player.transform.position = new Vector3(-vr_arena_limit, p_height, player.transform.position.z);
-            //    }
-            //    if (player.transform.position.x > vr_arena_limit)
-            //    {
-            //        player.transform.position = new Vector3(vr_arena_limit, p_height, player.transform.position.z);
-            //    }
-            //    if (player.transform.position.z < -vr_arena_limit)
-            //    {
-            //        player.transform.position = new Vector3(player.transform.position.x, p_height, -vr_arena_limit);
-            //    }
-            //    if (player.transform.position.z > vr_arena_limit)
-            //    {
-            //        player.transform.position = new Vector3(player.transform.position.x, p_height, vr_arena_limit);
-            //    }
+                if (player.transform.position.x < -vr_arena_limit)
+                {
+                    player.transform.position = new Vector3(-vr_arena_limit, p_height, player.transform.position.z);
+                }
+                if (player.transform.position.x > vr_arena_limit)
+                {
+                    player.transform.position = new Vector3(vr_arena_limit, p_height, player.transform.position.z);
+                }
+                if (player.transform.position.z < -vr_arena_limit)
+                {
+                    player.transform.position = new Vector3(player.transform.position.x, p_height, -vr_arena_limit);
+                }
+                if (player.transform.position.z > vr_arena_limit)
+                {
+                    player.transform.position = new Vector3(player.transform.position.x, p_height, vr_arena_limit);
+                }
 
 
-            //}
-
-            // if angle is defined, we are in training stage
-            //if (areWalls == 1f)
-            //{
-            //    var vr_arena_limit = 0.22f;
-
-
-            //}
+            }
 
 
 
 
-            UpdatePlayerPosition(player, zVel, xVel, yawVel);
+
+
+            //UpdatePlayerPosition(player, zVel, xVel, yawVel);
 
             //switch ((int)yaw_flag)
             //{
-  
+
             //    case 0:
             //        // head free to rotate
             //        //player.transform.position += new Vector3(0.0f, 0.0f, deltaZ);
@@ -1382,6 +1465,10 @@ public class RewardArena : MonoBehaviour
             //    onoff.Add(firefly.activeInHierarchy);
             //}
             //activeMC = true;
+
+            //Debug.Log("accelController connected? : " + accelController.IsConnected);
+            //Debug.Log("accelController reading    : " + accelController.reading);
+
             if (activeMC)
                 {
 
@@ -1415,6 +1502,8 @@ public class RewardArena : MonoBehaviour
                     motionCueingController.motionCueing.frame.pitch,
                     motionCueingController.motionCueing.frame.yaw,
                     accelController.IsConnected ? accelController.reading : "0,0,0,0,0,0"
+                    //motorController.PL_FB_Decimal
+
                     ) + "\n");
                 //string.Join(",", labJackController.ValueAIN)) + "\n");
 
@@ -1445,10 +1534,13 @@ public class RewardArena : MonoBehaviour
                     Ball.ballDeltaX,
                     Ball.ballDeltaYaw,
                     accelController.IsConnected ? accelController.reading : "0,0,0,0,0,0"
+                    //motorController.PL_FB_Decimal
                     ) + "\n");
                     //string.Join(",", labJackController.ValueAIN)) + "\n");
                 }
-                // playing
+            // playing
+
+
         }
         score = 0;
         timedout = 0;
@@ -1611,7 +1703,7 @@ public class RewardArena : MonoBehaviour
 
     async void Startup()
     {
-        await new WaitForSeconds(15.0f);
+        // await new WaitForSeconds(15.0f);
 
         currPhase = Phases.begin;
         phase = Phases.begin;
@@ -2038,13 +2130,13 @@ public class RewardArena : MonoBehaviour
 
             checkWait.Add(0.0f);
 
+            // print("lose sound here1    ------");
             audioSource.clip = loseSound;
         }
 
         isCheck = true;
 
-        //Debug.Log("isReward: " + isReward);
-        //Debug.Log("proximity: " + proximity);
+
 
         if (isReward && proximity)
         {
@@ -2058,6 +2150,7 @@ public class RewardArena : MonoBehaviour
         }
         else
         {
+            // print("lose sound here2    ------");
             audioSource.clip = loseSound;
             wait = interMax;
         }

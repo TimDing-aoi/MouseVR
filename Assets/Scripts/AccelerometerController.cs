@@ -24,6 +24,8 @@ public class AccelerometerController : MonoBehaviour
     public float accZ;
     public string reading;
     public bool IsConnected = true;
+    public string[] line;
+
     float dt = 0.0f;
     // Start is called before the first frame update
     void Start()
@@ -57,32 +59,71 @@ public class AccelerometerController : MonoBehaviour
     // Update is called once per frame
     public async void Update()
     {
-   
+        // Debug.Log("accelController reading at   : " + Time.time);
         try
         {
             reading = accel.readQueue();
 
-            string[] line = reading.Split(',');
+            // Debug.Log("accelController reading    : " + reading);
 
-            accX = float.Parse(line[0]);
-            accY = float.Parse(line[1]);
-            accZ = float.Parse(line[2]);
-            gyroX = float.Parse(line[3]);
-            gyroY = float.Parse(line[4]);
-            gyroZ = float.Parse(line[5]);
+            //if (reading != null)
+            //{
+            //    line = reading.Split(',');
 
-            //Debug.Log(dt - float.Parse(line[6]));
-            //Debug.Log(Time.deltaTime);
-            //dt = float.Parse(line[6]);
-            //print(accX);
+            //    accX = float.Parse(line[0]);
+            //    accY = float.Parse(line[1]);
+            //    accZ = float.Parse(line[2]);
+            //    gyroX = float.Parse(line[3]);
+            //    gyroY = float.Parse(line[4]);
+            //    gyroZ = float.Parse(line[5]);
+            //}
+            //else
+            //{
+            //    accel.close();
+            //    //accel = null;
+            //    //accel = new wrmhl();
+            //    accel.set(portName, baudRate, ReadTimeout, QueueLength);
+            //    accel.connect();
+                
+            //}
+
+
 
         }
-        catch (Exception e)
+        catch (Exception e1)
         {
+
+            //Debug.Log("data received: " + line[0] + "  " + line[1] + "  " + line[2] + "  " + line[3] + "  " + line[4] + "  " + line[5]);
+            Debug.Log("exception in accelerometer------------------------");
+            Debug.LogException(e1, this);
+            // Debug.Log("accelerometer disconnected at " + Time.realtimeSinceStartup);
+
+
+            //accel.close();
+            //accel = new wrmhl();
+            //accel.set(portName, baudRate, ReadTimeout, QueueLength);
+
+            //try
+            //{
+            //    accel.connect();
+            //    Debug.Log("reconnected " + Time.realtimeSinceStartup);
+            //}
+            //catch (Exception e2)
+            //{
+            //    Debug.LogException(e2, this);
+            //    Debug.Log("reconnect failed " + Time.realtimeSinceStartup);
+            //}
+
             //UnityEngine.Debug.LogError(e);
             //IsConnected = false;
         }
         await new WaitForUpdate();
+
+
+
+
+
+
 
     }
 

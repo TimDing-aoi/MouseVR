@@ -21,6 +21,7 @@ public class GoToSettings : MonoBehaviour
     public GameObject obj;
     public GameObject settingMenu1;
     public GameObject settingMenu2;
+    public GameObject settingMenu3;
     public MotionCueingController MotionCueingController;
     public UnityEngine.UI.Button saveButton;
     public UnityEngine.UI.Button loadButton;
@@ -821,7 +822,34 @@ public class GoToSettings : MonoBehaviour
                     }
                 }
             }
-            settingMenu1.SetActive(true);
+
+            foreach (Transform child in settingMenu3.transform)
+            {
+                foreach (Transform children in child)
+                {
+                    if (children.gameObject.CompareTag("Setting"))
+                    {
+                        if (children.name == "Distal Object" || children.name == "Dimensions")
+                        {
+                            TMP_Dropdown drop = children.GetComponent<TMP_Dropdown>();
+                            foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                            {
+                                foreach (XmlNode setting in node.ChildNodes)
+                                {
+                                    if (setting.Name == children.name.Replace(" ", ""))
+                                    {
+                                        drop.value = int.Parse(setting.InnerText);
+                                        PlayerPrefs.SetInt(children.name, drop.value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+                        settingMenu1.SetActive(true);
             settingMenu2.SetActive(false);
 
             if (settingMenu1.activeInHierarchy)
