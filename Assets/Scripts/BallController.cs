@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using UnityEngine;
+using static RingSensor;
+using static RewardArena;
 
 [DisallowMultipleComponent]
 public class BallController : MonoBehaviour
@@ -12,10 +14,11 @@ public class BallController : MonoBehaviour
     wrmhl ball = new wrmhl();
     public static BallController Ball;
 
+
     public float pitch;
     public float roll;
     [HideInInspector] public float yaw;
-    [HideInInspector] public float yawCopy;
+
 
     [HideInInspector] public float motorYaw;
     [HideInInspector] public float motorRoll;
@@ -33,6 +36,7 @@ public class BallController : MonoBehaviour
     public float xVel;
     public float zVel;
     public float yawVel;
+    public float yawVelRing;
 
     [HideInInspector] public float vert;
     [HideInInspector] public float hor;
@@ -54,6 +58,9 @@ public class BallController : MonoBehaviour
     private float maxAcc;
     [ShowOnly] public int seed;
 
+    private float lastFrameRingRead;
+    private float currentFrameRingRead;
+
     private bool keyboard;
     // replay vars
     bool isReplay;
@@ -68,7 +75,37 @@ public class BallController : MonoBehaviour
     float Xscale;
     float Yawscale;
 
+    float V_t1 = 0f;
+    float V_t2 = 0f;
+    float V_t3 = 0f;
+    float V_t4 = 0f;
 
+
+
+
+    float Apply_momentum(float V_t0)
+    {
+
+        float result = 0f;
+
+        if (!(V_t1 == 0f && V_t2 == 0f && V_t3 == 0f && V_t4 == 0f))
+        {
+            //result =  V_t0 * 0.5f + V_t1 * 0.2f + V_t2 * 0.1f + V_t3 * 0.1f + V_t4 * 0.1f;
+
+            result = (V_t0 + V_t1 + V_t2 + V_t3 + V_t4) / 5f;
+            V_t1 = V_t0;
+            V_t2 = V_t1;
+            V_t3 = V_t2;
+            V_t4 = V_t3;
+            return result;
+
+        }
+        V_t1 = V_t0;
+        V_t2 = V_t1;
+        V_t3 = V_t2;
+        V_t4 = V_t3;
+        return V_t0;
+    }
 
     void Start()
     {
@@ -128,6 +165,9 @@ public class BallController : MonoBehaviour
 
         maxSpeed = 0.2f/60.0f;
         maxAcc = 0.2f/3600.0f;
+        lastFrameRingRead = ringSensor.dir;
+        currentFrameRingRead = ringSensor.dir;
+
     }
 
     public async void Update()
@@ -153,7 +193,7 @@ public class BallController : MonoBehaviour
                     pitch = float.Parse(line[0]);
                     roll = float.Parse(line[1]);
                     yaw = float.Parse(line[2]);
-                    yawCopy = yaw;
+
 
                 }
 
@@ -167,6 +207,11 @@ public class BallController : MonoBehaviour
                 // squeze 360 deg into 30
                 //deltaYaw = deltaYaw * 12;
 
+                lastFrameRingRead = currentFrameRingRead;
+                currentFrameRingRead = ringSensor.dir;
+
+
+
 
                 if (isReplay & replayIdx < replayMaxIdx)
                 {
@@ -176,42 +221,141 @@ public class BallController : MonoBehaviour
                     deltaZ = replayZ[replayIdx];
                     deltaX = replayX[replayIdx];
                     deltaYaw = replayYaw[replayIdx];
-                    yawCopy = deltaYaw;
+
+
+                    //if (deltaZ > 0.015f)
+                    //{
+                    //    deltaZ = deltaZ / 5;
+                    //}else if (deltaZ < 0.015f && deltaZ > 0.01f)
+                    //{
+                    //    deltaZ = deltaZ / 2;
+                    //}
 
                     zVel = deltaZ / Time.deltaTime;
                     xVel = deltaX / Time.deltaTime;
                     yawVel = deltaYaw / Time.deltaTime;
+
+                    Apply_momentum(zVel);
+                    //zVel = zVel / 3f;
                     //player.transform.position += new Vector3(replayX[replayIdx], p_height, replayZ[replayIdx]);
                     //player.transform.rotation = Quaternion.Euler(0f, replayYaw[replayIdx], 0f);
+
+                    //// ignore yaw vel that is too small. 6 degree/s is the threshold for the yaw motor to respond
+                    if (yawVel > -6.0257f && yawVel < 6.0257f)
+                    {
+                        yawVel = 0;
+
+                    }
+
                     replayIdx++;
-                
+
                 }
+                // keyboard: acceleration
+
                 else if (keyboard)
                 {
 
                     kb_vert = Input.GetAxis("Vertical");
                     //     1 / 0.2 second / 100 = 50 cm/s
-                    zVel = kb_vert / Time.deltaTime/100/2.5f;
+                    zVel = kb_vert / Time.deltaTime / 100 / 2.5f;
 
 
-                
                     kb_hor = Input.GetAxis("Horizontal");
-                    xVel = kb_hor / Time.deltaTime/20/5;
+                    xVel = kb_hor / Time.deltaTime / 20 / 5;
 
+                    print("ball script 2222222222222, " + kb_hor);
 
-
-                    // 1 = 50 deg/s
-                    // roll / Time.deltaTime = 1/0.2 = 50 deg/s
+                    // 1 = 50 deg / s
+                    // roll / Time.deltaTime = 1 / 0.2 = 50 deg / s
                     yawVel = kb_hor / Time.deltaTime;
-                    // yawVel = 5.5f;
+
+                    //if (Math.Abs(yawVel) < 120f)
+                    //{
+                    //    yawVel += kb_hor / Time.deltaTime / 8;
+                    //}
+
+
+                    //if (kb_hor == 0)
+                    //{
+                    //    if (yawVel > 0)
+                    //    {
+                    //        yawVel -= 1 / Time.deltaTime / 8;
+                    //    }
+                    //    else if (yawVel < 0)
+                    //    {
+                    //        yawVel += 1 / Time.deltaTime / 8;
+                    //    }
+                    //    else
+                    //    {
+                    //        yawVel = 0;
+                    //    }
+
+                    //}
+
+                    //------------------------------    implementing ring MC   ------------------------------
+
+                    var deltaYawRing = currentFrameRingRead - lastFrameRingRead;
+
+
+                    // clw
+                    var playerAngle = SharedReward.player.transform.eulerAngles[1];
+
+                    if (deltaYawRing < -180 && playerAngle != 0f)
+                    {
+                        //print("---------------------clockwise rotation ");
+                        deltaYawRing =+ 360;
+                    } else if (deltaYawRing > 180 && playerAngle != 0f)
+                    {
+                        //print("---------------------counter clockwise rotation ");
+                        deltaYawRing = -360;
+                    }
+                    
+                    if (Math.Abs(deltaYawRing) > 4)
+                    {
+                        deltaYawRing = 0;
+                    }
+
+            
+                    var error = (currentFrameRingRead - playerAngle);
+                    error += (error > 180) ? -360 : (error < -180) ? 360 : 0;
+                    yawVelRing = deltaYawRing / Time.deltaTime;
+
+                    //print("Ring yaw angle : " + ringSensor.dir);
+                    //print("Player yaw angle : " + deltaYawRing);
+
+                    //------------------------------    implementing ring MC   ------------------------------ 
 
                 }
+
+
+
+                // keyboard: constant speed
+
+                //else if (keyboard)
+                //{
+
+                //    kb_vert = Input.GetAxis("Vertical");
+                //    //     1 / 0.2 second / 100 = 50 cm/s
+                //    zVel = kb_vert / Time.deltaTime / 100 / 2f;
+
+
+
+                //    kb_hor = Input.GetAxis("Horizontal");
+                //    xVel = kb_hor / Time.deltaTime / 20 / 5;
+
+
+                //    // 1 = 50 deg/s
+                //    // roll / Time.deltaTime = 1/0.2 = 50 deg/s
+                //    //yawVel = kb_hor / Time.deltaTime * 1.5f;
+                //    yawVel = kb_hor / Time.deltaTime;
+                //}
+
                 else
                 {
 
                     if (motorYaw > 0)
                     {
-                        
+
                         // yaw rotation is not probably detected, so disable yaw when runing at angle
                         if (Math.Abs(pitch) > 0.05)
                         {
@@ -221,8 +365,10 @@ public class BallController : MonoBehaviour
                     }
 
 
-                    zVel = ballDeltaZ / Time.deltaTime  * Zscale;
-                    xVel = ballDeltaX / Time.deltaTime  * Xscale;
+                    zVel = ballDeltaZ / Time.deltaTime * Zscale;
+                    xVel = ballDeltaX / Time.deltaTime * Xscale;
+
+                    
 
                     if (motorRoll > 0)
                     {
@@ -230,39 +376,36 @@ public class BallController : MonoBehaviour
 
                         // rotate when mice run at angle| tan45 = 1; tan60 = 1.73; tan75 = 3.73 (30 deg forward run area)
                         if (Math.Abs(zVel) / Math.Abs(xVel) < 2.73 & Math.Abs(xVel) > 0.015f)
-                            //if (Math.Abs(roll) > 0.03f)
+                        //if (Math.Abs(roll) > 0.03f)
                         {
                             //yawVel = (float)Math.Sqrt(zVel * zVel + xVel * xVel) * 300;
                             // roll and pitch combination is not symmetric, so that running at angle might be different for various angles
                             if (xVel > 0)
                             {
                                 // roll or deltaX is not symmetric, not sure why;
-                                yawVel = xVel * 600;
-                            } else
+                                yawVel = xVel * 800;
+                            }
+                            else
                             {
-                                yawVel = xVel * 300;
+                                yawVel = xVel * 400;
                             }
 
-                            
+
                             zVel = 0;
                             xVel = 0;
-               
+
                         }
                     }
 
-                    //// ignore yaw vel that is too small. 6 degree/s is the threshold for the yaw motor to respond
-                    if (yawVel > -6 && yawVel < 6)
-                    {
-                        yawVel = 0;
-
-                    }
-
-
-                    
 
                 }
-                // print("ball yaw ----------------------- " + yaw);
 
+                //// ignore yaw vel that is too small. 6 degree/s is the threshold for the yaw motor to respond
+                if (yawVel > -6.0257f && yawVel < 6.0257f)
+                {
+                    yawVel = 0;
+
+                }
             }
 
 
@@ -275,6 +418,7 @@ public class BallController : MonoBehaviour
             // coming in so there'll be an error saying there's no object or something
             // like that.
         }
+
         await new WaitForUpdate();
     }
 

@@ -15,6 +15,9 @@ using static BallController;
 using static AccelerometerController;
 using static RewardArena;
 using UnityEngine.InputSystem;
+using static RingSensor;
+//using UnityEditor.PackageManager;
+
 
 public class MotionCueingController : MonoBehaviour
 {
@@ -45,20 +48,28 @@ public class MotionCueingController : MonoBehaviour
     double limit6 = 150;
     double maxVelX = 1;
     double maxVelY = 1;
+
     double maxVelAng = 90;
 
     public double ballSpeed = 0;
     public double mcSpeed = 0;
     public double angSpeed = 0;
-
+    public double xVelBall = 0;
 
     public double curSpeed = 0;
     public double prevSpeed = 0;
     public double decayRate = 0.00005;
     public double locMaxSpeed = 0;
     public double origionalSpeed = 0;
+    public bool burstFlag = false;
 
     public int numOfFrames = 0;
+    public int numOfFramesGrowth = 0;
+
+    float currentAngle = 0f;
+    float lastAngle = 0f;
+    float accumulateAngle = 0f;
+    public float yawVelR = 0f;
 
     public Task<int> currentTask;
 
@@ -78,6 +89,7 @@ public class MotionCueingController : MonoBehaviour
         maxVelX = PlayerPrefs.GetFloat("Max X Vel") == 0f ? 1 : (double)PlayerPrefs.GetFloat("Max X Vel");
         maxVelY = PlayerPrefs.GetFloat("Max Y Vel") == 0f ? 1 : (double)PlayerPrefs.GetFloat("Max Y Vel");
         maxVelAng = PlayerPrefs.GetFloat("Max Ang Vel") == 0f ? 200 : (double)PlayerPrefs.GetFloat("Max Ang Vel");
+        maxVelAng = 500;
 
         keyboard = Keyboard.current;
 
@@ -124,7 +136,7 @@ public class MotionCueingController : MonoBehaviour
         {
             ballSpeed = 0.2f;
         }
-        else if (ballSpeed < 0)
+        else if (ballSpeed < 0 && SharedReward.ring != 1)
         {
             ballSpeed = 0;
         }
@@ -135,7 +147,32 @@ public class MotionCueingController : MonoBehaviour
 
 
         // apply a linear decay on the burst negative acceleration
-        if (curSpeed < prevSpeed || (mcSpeed - curSpeed < 0.05f && mcSpeed - curSpeed > 0) || SharedReward.mcStopFlag && mcSpeed > 0.03f)
+        //if (curSpeed < prevSpeed || (mcSpeed - curSpeed < 0.05f && mcSpeed - curSpeed > 0) || SharedReward.mcStopFlag && mcSpeed > 0.03f)
+        //{
+
+        //    numOfFrames++;
+        //    mcSpeed = locMaxSpeed - numOfFrames * 0.0076;
+
+        //    if (SharedReward.mcStopFlag)
+        //    {
+        //        mcSpeed = 0;
+        //    }
+
+
+        //}
+        //else
+        //{
+        //    locMaxSpeed = ballSpeed;
+        //    numOfFrames = 0;
+        //    mcSpeed = ballSpeed;
+        //}
+
+
+        /// This if statement is for the linear decay of speed. We apply a linear decay under these conditions:
+        /// 1. curSpeed < prevSpeed which is the general case of negative acceleration
+        /// 2. there is a huge speed drop in short period. delta_speed / frame is around 0.145 based on calculation. We take 0.1 for safety measurement
+        /// 3. when the player hits the wall with a speed > 0.03
+        if (curSpeed < prevSpeed || (locMaxSpeed - curSpeed) / numOfFrames > 0.01f || SharedReward.mcStopFlag && mcSpeed > 0.03f)
         {
 
             numOfFrames++;
@@ -151,23 +188,32 @@ public class MotionCueingController : MonoBehaviour
         else
         {
             locMaxSpeed = ballSpeed;
-            numOfFrames = 0;
+            numOfFrames = 1;
             mcSpeed = ballSpeed;
         }
 
         // apply a linear growth on the burst positive acceleration
-        if (curSpeed > prevSpeed && (curSpeed - prevSpeed)/ Time.deltaTime > 0.3)
-        {
-            origionalSpeed = prevSpeed;
-            numOfFrames++;
-            mcSpeed = locMaxSpeed + numOfFrames * 0.0076;
-        }
-        else
-        {
-            origionalSpeed = ballSpeed;
-            numOfFrames = 0;
-            mcSpeed = ballSpeed;
-        }
+        //if (curSpeed > prevSpeed && (curSpeed - prevSpeed)/ Time.deltaTime > 0.3)
+        //{
+
+        //    var grothRate = (curSpeed - prevSpeed) / 3f;
+
+        //    // only record the origionalSpeed at the begining
+        //    if (numOfFramesGrowth == 3)
+        //    {
+        //        origionalSpeed = prevSpeed;
+        //    }
+
+
+        //    mcSpeed = origionalSpeed + numOfFramesGrowth * grothRate;
+        //    numOfFramesGrowth--;
+        //}
+        //else
+        //{
+
+        //    numOfFramesGrowth = 3;
+        //    mcSpeed = ballSpeed;
+        //}
 
 
     }
@@ -202,6 +248,7 @@ public class MotionCueingController : MonoBehaviour
         {
 
             ballSpeed = Ball.zVel;
+            xVelBall = Ball.xVel;
             angSpeed = Ball.yawVel;
 
             linearSpeedControll();
@@ -210,6 +257,8 @@ public class MotionCueingController : MonoBehaviour
             IsStop = SharedReward.IsStop;
 
         }
+
+        
 
         if (active)
         {
@@ -225,11 +274,58 @@ public class MotionCueingController : MonoBehaviour
             }
             else
             {
-                if (flagMCActive && SharedReward.playing)
+                // && SharedReward.ring == 1f
+                if (flagMCActive && SharedReward.playing && SharedReward.ring == 1f)
+                {
+
+                    //print("MC calculate speed value:   ------------------------  " + angSpeed);
+                    //motionCueing.Calculate(mcSpeed, 0, angSpeed, 0, (uint)i, 0, IsStop);
+
+                    //------------------------------    implementing ring MC   ------------------------------ 
+
+                    lastAngle = currentAngle;
+                    currentAngle = ringSensor.dir;
+
+                    var deltaAngle = currentAngle - lastAngle;
+                    deltaAngle += (deltaAngle > 180) ? -360 : (deltaAngle < -180) ? 360 : 0;
+                    yawVelR = deltaAngle / Time.deltaTime;
+
+
+                    if (accumulateAngle < 0)
+                    {
+                        accumulateAngle += 360f;
+                    }
+                    if (accumulateAngle > 360)
+                    {
+
+                        accumulateAngle -= 360f;
+                    }
+
+                    accumulateAngle += yawVelR * Time.deltaTime;
+
+                    print("mc   angle -------------------------------- : " + accumulateAngle);
+                    print("ring angle -------------------------------- : " + ringSensor.dir);
+                    print("yaw vel calculated with ringSensor reading -------------------------------- : " + yawVelR);
+
+                    //yawVelR += (ringSensor.dir - accumulateAngle) / Time.deltaTime;
+
+                    if (Math.Abs(yawVelR) > 300f || Math.Abs(yawVelR) < 20f)
+                    {
+                        yawVelR = 0;
+                    }
+
+
+                    //motionCueing.Calculate(mcSpeed, 0, yawVelR, 0, (uint)i, 0, IsStop);
+                    motionCueing.Calculate(mcSpeed, xVelBall, 0, 0, (uint)i, 0, IsStop);
+
+
+
+                    //------------------------------    implementing ring MC   ------------------------------ 
+                }
+                else if (flagMCActive && SharedReward.playing && SharedReward.ring != 1f)
                 {
 
                     motionCueing.Calculate(mcSpeed, 0, angSpeed, 0, (uint)i, 0, IsStop);
-
                 }
             }
         }

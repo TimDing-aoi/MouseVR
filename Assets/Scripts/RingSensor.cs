@@ -3,13 +3,15 @@ using System.IO.Ports;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using static RingSensor;
+
 
 [DisallowMultipleComponent]
 public class RingSensor : MonoBehaviour
 {
 
     wrmhl ring = new wrmhl();
-    public string portName = "COM13";
+    public string portName = "COM5";
     public int baudRate = 2000000;
     public int ReadTimeout = 5000;
     public int QueueLength = 1;
@@ -40,18 +42,19 @@ public class RingSensor : MonoBehaviour
 
         
 
-        if (!keyboard)
-        {
-            ring.connect();
-        }
+        //if (!keyboard)
+        //{
+        //    ring.connect();
+        //}
+        ring.connect();
     }
 
     // Update is called once per frame
     public async void Update()
     {
 
-        
 
+        
         try
         {
             reading = ring.readQueue();
@@ -61,6 +64,8 @@ public class RingSensor : MonoBehaviour
             dir = float.Parse(reading);
 
             updatesCounter = 0;
+
+
 
             //if (updatesCounter % 100 == 0)
             //{
@@ -76,7 +81,9 @@ public class RingSensor : MonoBehaviour
         }
         catch (Exception e)
         {
+
             //UnityEngine.Debug.LogError(e);
+
             updatesCounter++;
             if (updatesCounter % 100 == 0)
                 PlayerPrefs.SetString("Ring State", "Disconnected");

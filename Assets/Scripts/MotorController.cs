@@ -2,10 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Net.Sockets;
+using System.Text;
 using UnityEngine;
 using static BallController;
 using static LabJackController;
 using static MotionCueingController;
+using static RewardArena;
+using static RingSensor;
+using EasyModbus;
+
 
 [DisallowMultipleComponent]
 public class MotorController : MonoBehaviour
@@ -16,11 +22,16 @@ public class MotorController : MonoBehaviour
     //public SerialController serialController;
 
     float prevValue = 0;
-    public float value = 0;
+    float value = 2.5f;
+    float preCompensateValue = 0;
+    float compensateValue_game = 0;
+    float compensateValue_yaw = 0;
+
     public bool IsConnected = true;
     public float deltaYaw = 0.0f;
     public float yawVel = 0.0f;
     public float yawVelMax;
+    public float PL_FB_Decimal = 0;
 
     public SerialPort _serialPort;
     public int ReadTimeout = 5000;
@@ -29,15 +40,16 @@ public class MotorController : MonoBehaviour
     public int baudRate = 2000000;
     public List<Dictionary<string, object>> data;
 
+    public double yawAngle = 0.0f;
+    public int updatesCounter = 0;
 
     float roll = 0.0f;
     float yaw = 0.0f;
     int idx = 0;
-    //bool flagReceived = true;
+
+    ModbusClient modbusClient;
+
     // Start is called before the first frame update
-
-
-
 
     void Start()
     {
@@ -53,7 +65,7 @@ public class MotorController : MonoBehaviour
         //motor.set(portName, baudRate, ReadTimeout, QueueLength);
         //motor.connect();
 
-  
+
         //// Change com port
         //_serialPort.PortName = "COM10";
         //// Change baud rate
@@ -74,6 +86,11 @@ public class MotorController : MonoBehaviour
         //    IsConnected = false;
         //}
 
+        Console.WriteLine("started Modbus TCP connection process");
+        modbusClient = new ModbusClient("192.168.0.22", 502);
+        modbusClient.Connect();
+
+
     }
 
     // Update is called once per frame
@@ -82,8 +99,7 @@ public class MotorController : MonoBehaviour
         if ((int)PlayerPrefs.GetFloat("Enable MC") == 1)
         {
             yawVel = (float)motionCueingController.motionCueing.filtered[2][2];
-            //Debug.Log("using yawVel from MC ----------------------------------------");
-            //yawVel = Ball.yawVel;
+
         }
         else
         {
@@ -92,57 +108,8 @@ public class MotorController : MonoBehaviour
 
 
         // 1.9 = 0 V
-
-        //print(yawVel);
-        //yawVel = deltaYaw / Time.deltaTime;
         yawVel /= yawVelMax;
 
-
-
-
-        //print(yaw);
-
-        //if (yaw > 0)
-        //{
-        //    yaw += 0.01f;
-
-        //    if (yaw > 0.99)
-        //    {
-        //        yaw = 0.99f;
-        //    }
-        //}
-        //else if (yaw < 0)
-        //{
-        //    yaw -= 0.01f;
-
-        //    if (yaw < -0.99)
-        //    {
-        //        yaw = -0.99f;
-        //    }
-        //}
-        //else
-        //{
-        //    if (yaw < 0)
-        //    {
-        //        yaw += 0.01f;
-
-        //        if (yaw > 0)
-        //        {
-        //            yaw = 0;
-        //        }
-        //    }
-        //    else if (yaw > 0)
-        //    {
-        //        yaw -= 0.01f;
-
-        //        if (yaw < 0)
-        //        {
-        //            yaw = 0;
-        //        }
-        //    }
-        //}
-
- 
 
         // -1, 1 min, max ang vel
         if (yawVel > 1)
@@ -155,45 +122,119 @@ public class MotorController : MonoBehaviour
             yawVel = -1.0f;
         }
 
-   
 
-        value = yawVel * 2.5f + 2.5f;
-        //serialController.SendSerialMessage(idx.ToString());
-        // we don't need to send to arduino if it's the same value
-        if (!(value == prevValue))
+        //////////////////////////////////////////////////// alignment ////////////////////////////////////////////////////////////////
+
+        /// the yawEulerAngles is calculated by the accumulation of angle change each frame.
+        /// when rotating counter clockwise, this value can be negative
+        /// when rotating a full cycle it can be greater than 360. Need to turn it to [0,360] for comparison
+        yawAngle += (value - 2.5f) * 80.343f * Time.deltaTime;
+
+        if (yawAngle < 0)
         {
-       
-            labJackController.ExecuteDACRequest(value);
+            yawAngle += 360f;
+        }
+        if (yawAngle > 360)
+        {
+            
+            yawAngle -= 360f;
+        }
+
+        //////////////////////////////////////////////////// alignment ////////////////////////////////////////////////////////////////
+
+        int[] readHoldingRegisters = { };
+
+        try
+        {
+            readHoldingRegisters = modbusClient.ReadHoldingRegisters(588, 4);
+            for (int i = 0; i < readHoldingRegisters.Length; i++)
+                Console.WriteLine("Value of HoldingRegister " + (i + 1) + " " + readHoldingRegisters[i].ToString());
+
+            // readHoldingRegisters[2] stores how many borrows made in calculation, 286 is the mechanical offset
+            PL_FB_Decimal = (readHoldingRegisters[2] * 65535 + readHoldingRegisters[3]) / 1000f - 286;
+        } catch (Exception e)
+        {
+            //print("PL.FB motor reading failed");
+        }
+        
 
 
-            // print("motor yaw ----------------------- " + value);
+        if (PL_FB_Decimal < 0)
+        {
+            PL_FB_Decimal += 360f;
+        }
+        if (PL_FB_Decimal > 360)
+        {
+            PL_FB_Decimal -= 360f;
+        }
 
-            //Debug.Log(value);
+        //print("PL_FB : " + PL_FB_Decimal);
+        //print("Player yaw angle : " + SharedReward.player.transform.eulerAngles[1]);
+        //var angleDiff = SharedReward.player.transform.eulerAngles[1] - PL_FB_Decimal;
 
-            //serialController.SendSerialMessage(value.ToString());
-            //_serialPort.Write(value.ToString() + '\n');
+        //print("angle diff is : " + angleDiff);
 
-            // uses writeline 
-            //motor.send(value.ToString());
-            prevValue = value;
-            //value = 150;
-            //_serialPort.DiscardOutBuffer();
-            //_serialPort.DiscardInBuffer();
+        var angleDiff = SharedReward.player.transform.eulerAngles[1] - PL_FB_Decimal;
+
+
+
+
+        if (angleDiff < 5 || angleDiff > 300)
+        {
+            angleDiff = 0;
+        }
+
+
+
+        if (updatesCounter % 5 == 0)
+        {
+            updatesCounter = 0;
+            compensateValue_yaw = (float)angleDiff / 8.0343f / Time.deltaTime / 6.25f;
+            compensateValue_game = (float)angleDiff / 80.343f / Time.deltaTime;
+
+            //// adsjusting the analog signal sending to the motor with fixed values
+            value = (yawVel) * 2.5f + 2.5f;
+
+            //if (angleDiff > 8 && angleDiff < 16)
+            //{
+            //    value += 0.1f;
+            //}
+            //else if (angleDiff > 16)
+            //{
+            //    value += 0.2f;
+            //}
+            //else if (angleDiff < -8 && angleDiff > -16)
+            //{
+            //    value -= 0.1f;
+            //}
+            //else if (angleDiff < -16)
+            //{
+            //    value -= 0.2f;
+            //}
+
+
+            //float voltageAdjustment = (float)angleDiff / 8;
+            //value += voltageAdjustment;
+
+
+            // we don't need to send to arduino if it's the same value
+            if (!(value == prevValue))
+            {
+                
+                labJackController.ExecuteDACRequest(value);
+                //yawAngle += compensateValue_game * 80.343f * Time.deltaTime;
+                // yawAngle += angleDiff;
+                prevValue = value;
+
+
+            }
         }
 
 
 
 
-        //string message = serialController.ReadSerialMessage();
+        updatesCounter++;
 
-        //if (message == null)
-        //    return;
-        //else
-        //    Debug.Log("Message arrived: " + message);
-
-        idx++;
-
-        await new WaitForUpdate();
 
     }
 
