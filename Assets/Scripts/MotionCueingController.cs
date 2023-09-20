@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using static BallController;
+using static MotorController;
 using static AccelerometerController;
 using static RewardArena;
 using UnityEngine.InputSystem;
@@ -53,8 +54,11 @@ public class MotionCueingController : MonoBehaviour
 
     public double ballSpeed = 0;
     public double mcSpeed = 0;
+    public double mcXVel = 0;
     public double angSpeed = 0;
     public double xVelBall = 0;
+    public double prev_mcSpeed = 0;
+    public double prev_mcXVel = 0; 
 
     public double curSpeed = 0;
     public double prevSpeed = 0;
@@ -89,7 +93,7 @@ public class MotionCueingController : MonoBehaviour
         maxVelX = PlayerPrefs.GetFloat("Max X Vel") == 0f ? 1 : (double)PlayerPrefs.GetFloat("Max X Vel");
         maxVelY = PlayerPrefs.GetFloat("Max Y Vel") == 0f ? 1 : (double)PlayerPrefs.GetFloat("Max Y Vel");
         maxVelAng = PlayerPrefs.GetFloat("Max Ang Vel") == 0f ? 200 : (double)PlayerPrefs.GetFloat("Max Ang Vel");
-        maxVelAng = 500;
+
 
         keyboard = Keyboard.current;
 
@@ -131,90 +135,174 @@ public class MotionCueingController : MonoBehaviour
 
     public void linearSpeedControll()
     {
-
-        if (ballSpeed > 0.2f)
+        if (flagMCActive && SharedReward.playing && SharedReward.ring == 1f)
+        //if (SharedReward.playing && SharedReward.ring == 1f)
+        //if (false)
         {
-            ballSpeed = 0.2f;
-        }
-        else if (ballSpeed < 0 && SharedReward.ring != 1)
-        {
-            ballSpeed = 0;
-        }
-
-
-        prevSpeed = curSpeed;
-        curSpeed = ballSpeed;
-
-
-        // apply a linear decay on the burst negative acceleration
-        //if (curSpeed < prevSpeed || (mcSpeed - curSpeed < 0.05f && mcSpeed - curSpeed > 0) || SharedReward.mcStopFlag && mcSpeed > 0.03f)
-        //{
-
-        //    numOfFrames++;
-        //    mcSpeed = locMaxSpeed - numOfFrames * 0.0076;
-
-        //    if (SharedReward.mcStopFlag)
-        //    {
-        //        mcSpeed = 0;
-        //    }
-
-
-        //}
-        //else
-        //{
-        //    locMaxSpeed = ballSpeed;
-        //    numOfFrames = 0;
-        //    mcSpeed = ballSpeed;
-        //}
-
-
-        /// This if statement is for the linear decay of speed. We apply a linear decay under these conditions:
-        /// 1. curSpeed < prevSpeed which is the general case of negative acceleration
-        /// 2. there is a huge speed drop in short period. delta_speed / frame is around 0.145 based on calculation. We take 0.1 for safety measurement
-        /// 3. when the player hits the wall with a speed > 0.03
-        if (curSpeed < prevSpeed || (locMaxSpeed - curSpeed) / numOfFrames > 0.01f || SharedReward.mcStopFlag && mcSpeed > 0.03f)
-        {
-
-            numOfFrames++;
-            mcSpeed = locMaxSpeed - numOfFrames * 0.0076;
-
-            if (SharedReward.mcStopFlag)
+            print("In new loop");
+            double speed_mag = Math.Sqrt(Math.Pow(ballSpeed, 2) + Math.Pow(xVelBall, 2));
+            //print(speed_mag);
+            if (speed_mag > 0.2f)
             {
-                mcSpeed = 0;
+                double scaleFactor = 0.2f / speed_mag;
+                ballSpeed *= scaleFactor;
+                xVelBall *= scaleFactor;
             }
 
+            double final_speed = Math.Sqrt(Math.Pow(ballSpeed, 2) + Math.Pow(xVelBall, 2));
+            prevSpeed = curSpeed;
+            curSpeed = final_speed;
+            print("curSpeed" + final_speed);
 
+            mcXVel = xVelBall;
+            mcSpeed = ballSpeed;
+
+            //double vel_diffx = xVelBall - prev_mcXVel;
+            //double vel_diffz = ballSpeed - prev_mcSpeed;
+            //double vel_diff_mag = Math.Sqrt(Math.Pow(vel_diffx, 2) + Math.Pow(vel_diffz, 2));
+
+            //double max_acc_constant = 1.0f * Time.deltaTime;
+
+            //if (vel_diff_mag >= max_acc_constant) //0.01f is the constant I need to change; make this into a variable and multiple it by time.Deltatime.
+            //{
+            //    numOfFrames++;
+            //    mcXVel = prev_mcXVel + max_acc_constant * vel_diffx / vel_diff_mag;
+            //    mcSpeed = prev_mcSpeed + max_acc_constant * vel_diffz / vel_diff_mag;
+            //    print("Number of Frames:" + numOfFrames);
+            //}
+            //else
+            //{
+            //    mcXVel = xVelBall;
+            //    mcSpeed = ballSpeed;
+            //    numOfFrames = 1;
+            //}
+
+            //prev_mcXVel = mcXVel;
+            //prev_mcSpeed = mcSpeed;
+
+
+
+            ///// This if statement is for the linear decay of speed. We apply a linear decay under these conditions:
+            ///// 1. curSpeed < prevSpeed which is the general case of negative acceleration
+            ///// 2. there is a huge speed drop in short period. delta_speed / frame is around 0.145 based on calculation. We take 0.1 for safety measurement
+            ///// 3. when the player hits the wall with a speed > 0.03
+            //if (curSpeed < prevSpeed || (locMaxSpeed - curSpeed) / numOfFrames > 0.01f || SharedReward.mcStopFlag && mcSpeed > 0.03f)
+            //{
+
+            //    numOfFrames++;
+
+            //    double decay_constant = 0.0076f;
+            //    mcSpeed = ballSpeed / (1 + decay_constant / curSpeed * numOfFrames);
+            //    mcXVel = xVelBall / (1 + decay_constant / curSpeed * numOfFrames);
+            //    print("DECAY:" + (1 + decay_constant / curSpeed * numOfFrames));
+
+            //    //double decay_constant = 23.0258f;
+            //    //mcSpeed = ballSpeed * Math.Exp(-decay_constant * numOfFrames);
+            //    //mcXVel = xVelBall * Math.Exp(-decay_constant * numOfFrames);
+            //    //print("DECAY:" + Math.Exp(-decay_constant * numOfFrames));
+
+            //    //double mcSpeed_sign = Math.Sign(ballSpeed);
+            //    //double mcXVel_sign = Math.Sign(xVelBall);
+            //    //mcSpeed = ballSpeed + -1 * mcSpeed_sign * numOfFrames * 0.0076;
+            //    //mcXVel = xVelBall + -1 * mcXVel_sign * numOfFrames * 0.0076;
+            //    ////print("mcSpeed reduction:" + (-1 * mcSpeed_sign * numOfFrames * 0.0076 / 2));
+            //    ////print("mcXVel reduction:" + (-1 * mcXVel_sign * numOfFrames * 0.0076 / 2));
+            //    //if (mcSpeed < 0)
+            //    //{
+            //    //    print("PITCH NEGATIVE!");
+            //    //}
+
+            //    //if (mcXVel < 0)
+            //    //{
+            //    //    print("ROLL NEGATIVE!");
+            //    //}
+
+            //    //if (SharedReward.mcStopFlag)
+            //    //{
+            //    //    mcSpeed = 0;
+            //    //    mcXVel = 0;
+            //    //}
+
+
+            //}
+            //else
+            //{
+            //    locMaxSpeed = final_speed;
+            //    numOfFrames = 1;
+            //    mcSpeed = ballSpeed;
+            //    mcXVel = xVelBall;
+            //}
+
+            
         }
         else
         {
-            locMaxSpeed = ballSpeed;
-            numOfFrames = 1;
+            print("In original loop");
+            if (ballSpeed > 0.2f)
+            {
+                ballSpeed = 0.2f;
+            }
+            else if (ballSpeed < -0.2f && SharedReward.ring != 1)
+            {
+                ballSpeed = -0.2f; //this doesn't allow for backwards movement
+            }
+
+            prevSpeed = curSpeed;
+            curSpeed = ballSpeed;
             mcSpeed = ballSpeed;
+
+
+            /// This if statement is for the linear decay of speed. We apply a linear decay under these conditions:
+            /// 1. curSpeed < prevSpeed which is the general case of negative acceleration
+            /// 2. there is a huge speed drop in short period. delta_speed / frame is around 0.145 based on calculation. We take 0.1 for safety measurement
+            /// 3. when the player hits the wall with a speed > 0.03
+            //if (curSpeed < prevSpeed || (locMaxSpeed - curSpeed) / numOfFrames > 0.01f || SharedReward.mcStopFlag && mcSpeed > 0.03f)
+            //{
+
+            //    numOfFrames++;
+            //    mcSpeed = locMaxSpeed - numOfFrames * 0.0076;
+
+            //    if (SharedReward.mcStopFlag)
+            //    {
+            //        mcSpeed = 0;
+            //    }
+
+
+            //}
+            //else
+            //{
+            //    locMaxSpeed = ballSpeed;
+            //    numOfFrames = 1;
+            //    mcSpeed = ballSpeed;
+            //}
+
+            //double max_acc_constant = 1.0f * Time.deltaTime;
+            ////double max_acc_constant = 0.8f * Time.deltaTime;
+
+            //print("max_acc:" + max_acc_constant);
+
+            //if (prev_mcSpeed - ballSpeed >= max_acc_constant) //0.01f is the constant I need to change; make this into a variable and multiple it by time.Deltatime.
+            //{
+            //    numOfFrames++;
+            //    mcSpeed = prev_mcSpeed - max_acc_constant;
+            //    print("Number of Frames:" + numOfFrames);
+
+            //}
+            //else if (prev_mcSpeed - ballSpeed <= -max_acc_constant)
+            //{
+            //    numOfFrames++;
+            //    mcSpeed = prev_mcSpeed + max_acc_constant;
+            //    print("Number of Frames:" + numOfFrames);
+            //}
+            //else
+            //{
+            //    mcSpeed = ballSpeed;
+            //    numOfFrames = 1;
+            //}
+            
+            //print("curSpeed:" + curSpeed);
+            //prev_mcSpeed = mcSpeed;
         }
-
-        // apply a linear growth on the burst positive acceleration
-        //if (curSpeed > prevSpeed && (curSpeed - prevSpeed)/ Time.deltaTime > 0.3)
-        //{
-
-        //    var grothRate = (curSpeed - prevSpeed) / 3f;
-
-        //    // only record the origionalSpeed at the begining
-        //    if (numOfFramesGrowth == 3)
-        //    {
-        //        origionalSpeed = prevSpeed;
-        //    }
-
-
-        //    mcSpeed = origionalSpeed + numOfFramesGrowth * grothRate;
-        //    numOfFramesGrowth--;
-        //}
-        //else
-        //{
-
-        //    numOfFramesGrowth = 3;
-        //    mcSpeed = ballSpeed;
-        //}
-
 
     }
 
@@ -316,7 +404,9 @@ public class MotionCueingController : MonoBehaviour
 
 
                     //motionCueing.Calculate(mcSpeed, 0, yawVelR, 0, (uint)i, 0, IsStop);
-                    motionCueing.Calculate(mcSpeed, xVelBall, 0, 0, (uint)i, 0, IsStop);
+                    motionCueing.Calculate(mcSpeed, mcXVel, 0, 0, (uint)i, 0, IsStop);
+                    //motionCueing.Calculate(mcSpeed, xVelBall, 0, 0, (uint)i, 0, IsStop); //old
+                    //print("Using mcXVel");
 
 
 
@@ -324,8 +414,9 @@ public class MotionCueingController : MonoBehaviour
                 }
                 else if (flagMCActive && SharedReward.playing && SharedReward.ring != 1f)
                 {
-
-                    motionCueing.Calculate(mcSpeed, 0, angSpeed, 0, (uint)i, 0, IsStop);
+                    double moog_yaw_pos = motorController.PL_FB_Decimal;
+                    motionCueing.Calculate(mcSpeed, 0, angSpeed, moog_yaw_pos, (uint)i, 0, IsStop);
+                    //motionCueing.Calculate(mcSpeed, 0, angSpeed, 0, (uint)i, 0, IsStop); //old
                 }
             }
         }
@@ -1569,7 +1660,8 @@ public class CMotionCueing : IDisposable
             ball_yaw = tuple.Item3;
             //Debug.Log(string.Format("Filtered:{0},{1},{2}", ball_x, ball_y, ball_yaw));
 
-            CallImportInputs(this.m_pNativeObject, ball_x, ball_y, ball_yaw, moog_yaw, 10.0, 10.6);
+            //CallImportInputs(this.m_pNativeObject, ball_x, ball_y, ball_yaw, moog_yaw, 10.0, 10.6);
+            CallImportInputs(this.m_pNativeObject, ball_x, ball_y, ball_yaw, moog_yaw, SharedReward.vr_arena_limit, SharedReward.vr_arena_limit-0.05f);
 
             CallCalculation(this.m_pNativeObject);
 

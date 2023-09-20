@@ -137,7 +137,7 @@ public class BallController : MonoBehaviour
         initTime = Time.time;
 
         isReplay = (int)PlayerPrefs.GetFloat("IsReplay") == 1;
-        print(string.Format("is replay {0}, is keyboard {1}", isReplay, keyboard));
+        //print(string.Format("is replay {0}, is keyboard {1}", isReplay, keyboard));
 
         // calibration
         Zscale = PlayerPrefs.GetFloat("ZScale") == 0 ? 1 : PlayerPrefs.GetFloat("ZScale");
@@ -163,8 +163,8 @@ public class BallController : MonoBehaviour
             replayMaxIdx = replayX.Count;
         }
 
-        maxSpeed = 0.2f/60.0f;
-        maxAcc = 0.2f/3600.0f;
+        maxSpeed = 0.2f/60.0f; //not used
+        maxAcc = 0.2f/3600.0f; //not used
         lastFrameRingRead = ringSensor.dir;
         currentFrameRingRead = ringSensor.dir;
 
@@ -200,12 +200,24 @@ public class BallController : MonoBehaviour
 
 
                 // calibrate once a week
-                ballDeltaZ = pitch * -0.0085384834f * 3f;
-                ballDeltaX = roll * -0.0093862942f * 2.5f;
-                // ball/visual = 1
-                ballDeltaYaw = yaw * -0.1713298528f * 4;
+                //ballDeltaZ = pitch * -0.0085384834f * 3f;
+                //ballDeltaX = roll * -0.0093862942f * 2.5f;
+                //ballDeltaYaw = yaw * -0.1713298528f * 4;
                 // squeze 360 deg into 30
                 //deltaYaw = deltaYaw * 12;
+                float ball_circumference = 0.937608f;
+                //float full_rotation_to_vr_z_coord = 19.9055f;
+                //float full_rotation_to_vr_z_coord = 18.38f;
+                float full_rotation_to_vr_z_coord = 18.936f;
+                float full_rotation_to_vr_x_coord = 18.936f;
+                float full_rotation_to_vr_degrees = 237.34f;
+                float pitch_gain = ball_circumference / full_rotation_to_vr_z_coord;
+                float roll_gain = ball_circumference / full_rotation_to_vr_x_coord;
+                float yaw_gain = 360.0f / full_rotation_to_vr_degrees;
+
+                ballDeltaZ = pitch * pitch_gain;
+                ballDeltaX = roll * roll_gain;
+                ballDeltaYaw = yaw * yaw_gain;
 
                 lastFrameRingRead = currentFrameRingRead;
                 currentFrameRingRead = ringSensor.dir;
@@ -257,17 +269,27 @@ public class BallController : MonoBehaviour
 
                     kb_vert = Input.GetAxis("Vertical");
                     //     1 / 0.2 second / 100 = 50 cm/s
+                    //zVel = kb_vert / Time.deltaTime / 100 * 0.5f;
                     zVel = kb_vert / Time.deltaTime / 100 / 2.5f;
 
 
                     kb_hor = Input.GetAxis("Horizontal");
-                    xVel = kb_hor / Time.deltaTime / 20 / 5;
+                    //xVel = kb_hor / Time.deltaTime / 20 / 5;
+                    xVel = kb_hor / Time.deltaTime / 100 / 2.5f;
 
-                    print("ball script 2222222222222, " + kb_hor);
+                    //print("ball script 2222222222222, " + kb_hor);
 
                     // 1 = 50 deg / s
                     // roll / Time.deltaTime = 1 / 0.2 = 50 deg / s
                     yawVel = kb_hor / Time.deltaTime;
+
+                    //// ignore yaw vel that is too small. 6 degree/s is the threshold for the yaw motor to respond
+                    if (yawVel > -6.0257f && yawVel < 6.0257f) //deadband = 0.075V
+                    //if (yawVel > -4.01715f && yawVel < 4.01715f) //deadband = 0.05V
+                    {
+                        yawVel = 0;
+
+                    }
 
                     //if (Math.Abs(yawVel) < 120f)
                     //{
@@ -357,10 +379,10 @@ public class BallController : MonoBehaviour
                     {
 
                         // yaw rotation is not probably detected, so disable yaw when runing at angle
-                        if (Math.Abs(pitch) > 0.05)
-                        {
-                            ballDeltaYaw = 0;
-                        }
+                        //if (Math.Abs(pitch) > 0.05)
+                        //{
+                        //    ballDeltaYaw = 0;
+                        //}
                         yawVel = ballDeltaYaw / Time.deltaTime;
                     }
 
@@ -375,15 +397,18 @@ public class BallController : MonoBehaviour
                         yawVel = 0;
 
                         // rotate when mice run at angle| tan45 = 1; tan60 = 1.73; tan75 = 3.73 (30 deg forward run area)
-                        if (Math.Abs(zVel) / Math.Abs(xVel) < 2.73 & Math.Abs(xVel) > 0.015f)
-                        //if (Math.Abs(roll) > 0.03f)
-                        {
+                        //if (Math.Abs(zVel) / Math.Abs(xVel) < 2.73 & Math.Abs(xVel) > 0.015f)
+                        if (Math.Abs(zVel) / Math.Abs(xVel) < 0.57735026919f) //that number is tan(30 degrees)
+                            //if (Math.Abs(roll) > 0.03f)
+                            {
                             //yawVel = (float)Math.Sqrt(zVel * zVel + xVel * xVel) * 300;
                             // roll and pitch combination is not symmetric, so that running at angle might be different for various angles
                             if (xVel > 0)
                             {
                                 // roll or deltaX is not symmetric, not sure why;
-                                yawVel = xVel * 800;
+                                //yawVel = xVel * 800;
+                                // if symmetric
+                                yawVel = xVel * 400;
                             }
                             else
                             {
@@ -401,7 +426,8 @@ public class BallController : MonoBehaviour
                 }
 
                 //// ignore yaw vel that is too small. 6 degree/s is the threshold for the yaw motor to respond
-                if (yawVel > -6.0257f && yawVel < 6.0257f)
+                if (yawVel > -6.0257f && yawVel < 6.0257f) //deadband = 0.075V
+                //if (yawVel > -4.01715f && yawVel < 4.01715f) //deadband = 0.05V
                 {
                     yawVel = 0;
 

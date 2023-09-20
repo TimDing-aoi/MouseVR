@@ -164,6 +164,7 @@ public class RewardArena : MonoBehaviour
     private Vector3 pPos;
     private bool isTimeout = false;
     private bool bury_start = false;
+    public float vr_arena_limit;
 
     // Trial number
     //readonly List<int> trial = new List<int>();
@@ -402,6 +403,9 @@ public class RewardArena : MonoBehaviour
 
     public int session_starttime;
     public int minutes_elapsed;
+    public float playerZPosition;
+    public float playerXPosition;
+    public float playerRotatedPosition;
     //string replayPath;
     //readonly List<float> replayX = new List<float>();
     //readonly List<float> replayZ = new List<float>();
@@ -786,7 +790,7 @@ public class RewardArena : MonoBehaviour
         // string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ, zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,TTL,Tx,Ty,Tz,Rx,Ry,Rz,head_dir,MotorPosition";
 
         //string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,DistalOnOff,DistalRotation,balldZ,balldX,balldYaw,surge,lateral,heave,roll,pitch,yaw,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,MotorPosition";
-        string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,DistalOnOff,DistalRotation,balldZ,balldX,balldYaw,surge,lateral,heave,roll,pitch,yaw,AccX,AccY,AccZ,GyroX,GyroY,GyroZ";
+        string firstLine = "TrialNum,TrialTime,Phase,OnOff,PosX,PosY,PosZ,RotX,RotY,RotZ,zVel,xVel,yawVel,FFX,FFY,FFZ,FFV,distToFF,score,rewardTime,timedout,TTL,head_dir,DistalOnOff,DistalRotation,balldZ,balldX,balldYaw,surge,lateral,heave,roll,pitch,yaw,AccX,AccY,AccZ,GyroX,GyroY,GyroZ,YawSensor";
 
 
         File.AppendAllText(contPath, firstLine + "\n");
@@ -1110,14 +1114,14 @@ public class RewardArena : MonoBehaviour
 
             //print(String.Format("head_dir: {0}, lick: {1}, sync: {2}", head_dir, lick, sync_ttl));
 
-            var vr_arena_limit = 1000f;
+            vr_arena_limit = 1000f;
             if (areWalls == 1)
             {
                 vr_arena_limit = 0.28f;
             }
             if (areWalls == 2)
             {
-                vr_arena_limit = 0.47f;
+                vr_arena_limit = 0.57f;
             }
 
             if (activeMC)
@@ -1149,7 +1153,7 @@ public class RewardArena : MonoBehaviour
 
                 prevFrameData.Enqueue(curFrameData);
 
-                if (prevFrameData.Count > 1)
+                if (prevFrameData.Count > 0)
                 {
                     float[] lastFrameData = prevFrameData.Dequeue();
 
@@ -1472,7 +1476,7 @@ public class RewardArena : MonoBehaviour
             if (activeMC)
                 {
 
-                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28}",
+                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29}",
                     trialNum,
                     Time.realtimeSinceStartup - programT0,
                     (int)currPhase,
@@ -1501,16 +1505,16 @@ public class RewardArena : MonoBehaviour
                     motionCueingController.motionCueing.frame.roll,
                     motionCueingController.motionCueing.frame.pitch,
                     motionCueingController.motionCueing.frame.yaw,
-                    accelController.IsConnected ? accelController.reading : "0,0,0,0,0,0"
-                    //motorController.PL_FB_Decimal
+                    accelController.IsConnected ? accelController.reading : "0,0,0,0,0,0",
+                    motorController.PL_FB_Decimal
 
-                    ) + "\n");
+                    ) + "\n");;;
                 //string.Join(",", labJackController.ValueAIN)) + "\n");
 
 
             } else
                 {
-                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22}",
+                    sb.Append(string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23}",
                     trialNum,
                     Time.realtimeSinceStartup - programT0,
                     (int)currPhase,
@@ -1533,8 +1537,8 @@ public class RewardArena : MonoBehaviour
                     Ball.ballDeltaZ,
                     Ball.ballDeltaX,
                     Ball.ballDeltaYaw,
-                    accelController.IsConnected ? accelController.reading : "0,0,0,0,0,0"
-                    //motorController.PL_FB_Decimal
+                    accelController.IsConnected ? accelController.reading : "0,0,0,0,0,0",
+                    motorController.PL_FB_Decimal
                     ) + "\n");
                     //string.Join(",", labJackController.ValueAIN)) + "\n");
                 }
@@ -1614,6 +1618,9 @@ public class RewardArena : MonoBehaviour
         idx++;
 
         minutes_elapsed = (int)Time.time - session_starttime;
+        playerZPosition = player.transform.position.z;
+        playerXPosition = player.transform.position.x;
+        playerRotatedPosition = player.transform.eulerAngles.y;
 
         updatesCounter++;
 

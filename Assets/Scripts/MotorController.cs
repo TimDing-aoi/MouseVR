@@ -32,6 +32,7 @@ public class MotorController : MonoBehaviour
     public float yawVel = 0.0f;
     public float yawVelMax;
     public float PL_FB_Decimal = 0;
+    public float origin_PL_FB_Decimal;
 
     public SerialPort _serialPort;
     public int ReadTimeout = 5000;
@@ -90,6 +91,29 @@ public class MotorController : MonoBehaviour
         modbusClient = new ModbusClient("192.168.0.22", 502);
         modbusClient.Connect();
 
+        int[] readHoldingRegisters = { };
+
+        try
+        {
+            readHoldingRegisters = modbusClient.ReadHoldingRegisters(588, 4);
+            //print(readHoldingRegisters[2] + "," + readHoldingRegisters[3]);
+            for (int i = 0; i < readHoldingRegisters.Length; i++)
+                Console.WriteLine("Value of HoldingRegister " + (i + 1) + " " + readHoldingRegisters[i].ToString());
+
+            long combinedNumber = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                combinedNumber = (combinedNumber << 16) | (ushort)readHoldingRegisters[i];
+
+            }
+            origin_PL_FB_Decimal = (float)combinedNumber / 1000;
+            //print("Original Angle: " + origin_PL_FB_Decimal);
+
+        }
+        catch (Exception e)
+        {
+            //print("PL.FB motor reading failed");
+        }
 
     }
 
@@ -109,7 +133,7 @@ public class MotorController : MonoBehaviour
 
         // 1.9 = 0 V
         yawVel /= yawVelMax;
-
+        
 
         // -1, 1 min, max ang vel
         if (yawVel > 1)
@@ -147,12 +171,30 @@ public class MotorController : MonoBehaviour
         try
         {
             readHoldingRegisters = modbusClient.ReadHoldingRegisters(588, 4);
+            //print(readHoldingRegisters[2] + "," + readHoldingRegisters[3]);
             for (int i = 0; i < readHoldingRegisters.Length; i++)
                 Console.WriteLine("Value of HoldingRegister " + (i + 1) + " " + readHoldingRegisters[i].ToString());
 
             // readHoldingRegisters[2] stores how many borrows made in calculation, 286 is the mechanical offset
-            PL_FB_Decimal = (readHoldingRegisters[2] * 65535 + readHoldingRegisters[3]) / 1000f - 286;
-        } catch (Exception e)
+            //PL_FB_Decimal = (readHoldingRegisters[2] * 65535 + readHoldingRegisters[3]) / 1000f - 286; //286 is the offset of the yaw motor
+            //print((readHoldingRegisters[2] * 65535 + readHoldingRegisters[3]) / 1000f);
+            //print(PL_FB_Decimal);
+
+
+            // This code is used to convert the 2-byte signed value two's complement Big endian style array from readHoldingRegisters to the actual degrees.
+            long combinedNumber = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                combinedNumber = (combinedNumber << 16) | (ushort)readHoldingRegisters[i];
+            
+            }
+            PL_FB_Decimal = (float)combinedNumber / 1000 - origin_PL_FB_Decimal;
+            //print("Original angle:" + origin_PL_FB_Decimal);
+            //print("Combined Number: " + (float)combinedNumber / 1000);
+            //print("PL_FB : " + PL_FB_Decimal);
+
+        }
+        catch (Exception e)
         {
             //print("PL.FB motor reading failed");
         }
@@ -174,9 +216,11 @@ public class MotorController : MonoBehaviour
 
         //print("angle diff is : " + angleDiff);
 
-        var angleDiff = SharedReward.player.transform.eulerAngles[1] - PL_FB_Decimal;
+        var angleDiff = SharedReward.player.transform.eulerAngles.y - PL_FB_Decimal;
 
-
+        //print(SharedReward.player.transform.eulerAngles.y);
+        print("PL_FB : " + PL_FB_Decimal);
+        print("angle diff is : " + angleDiff);
 
 
         if (angleDiff < 5 || angleDiff > 300)
@@ -193,7 +237,9 @@ public class MotorController : MonoBehaviour
             compensateValue_game = (float)angleDiff / 80.343f / Time.deltaTime;
 
             //// adsjusting the analog signal sending to the motor with fixed values
-            value = (yawVel) * 2.5f + 2.5f;
+            value = (yawVel) * 2.5f + 2.5f; //2.5V makes motor stationary and anything below makes it rotate counterclockwise and abov clockwise
+
+            
 
             //if (angleDiff > 8 && angleDiff < 16)
             //{
@@ -220,7 +266,6 @@ public class MotorController : MonoBehaviour
             // we don't need to send to arduino if it's the same value
             if (!(value == prevValue))
             {
-                
                 labJackController.ExecuteDACRequest(value);
                 //yawAngle += compensateValue_game * 80.343f * Time.deltaTime;
                 // yawAngle += angleDiff;
