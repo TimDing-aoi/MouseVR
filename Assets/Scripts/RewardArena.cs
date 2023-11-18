@@ -1226,7 +1226,7 @@ public class RewardArena : MonoBehaviour
 
 
                 var futurePlayer = player;
-
+     
                 UpdatePlayerPosition(futurePlayer, zVel, xVel, yawVel);
 
                 // arena using yawVelRing
